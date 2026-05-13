@@ -21,7 +21,7 @@ docker labspace version
 ```
 
 ```bash
-CONTENT_PATH=$PWD docker compose up --watch
+SHELL=$PWD/bin/labspace-shell CONTENT_PATH=$PWD docker compose up --watch
 ```
 
 Inside the Labspace terminal, follow the Prerequisites section.
