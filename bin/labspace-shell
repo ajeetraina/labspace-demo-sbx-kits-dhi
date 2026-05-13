@@ -1,6 +1,8 @@
 #!/bin/sh
 set -eu
 
-# The SBX Labspace terminal runs directly on the host. Use a clean zsh so
-# host-only shell integrations such as atuin cannot break lab commands.
-exec /bin/zsh -f "$@"
+# The SBX Labspace terminal runs directly on the host. Keep the user's normal
+# interactive zsh config, but mark the session so host-only integrations that
+# are unsafe in browser terminals can opt out.
+export LABSPACE_TERMINAL=1
+exec /bin/zsh "$@"
