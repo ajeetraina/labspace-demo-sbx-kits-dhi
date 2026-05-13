@@ -8,7 +8,7 @@ description: |
   Compare plain SBX agent containerization with kit-guided best practices and a DHI plus Docker Scout policy gate.
 
 sections:
-  - title: Step 0: Prerequisites
+  - title: "Step 0: Prerequisites"
     contentPath: 00-prerequisites.md
   - title: Start with a Plain Sandbox
     contentPath: 01-plain-sandbox.md
