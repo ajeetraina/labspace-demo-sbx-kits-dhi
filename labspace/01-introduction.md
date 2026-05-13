@@ -1,21 +1,30 @@
-# Introduction
+# Setup the SBX Demo
 
-👋 Welcome to the **Labspace starter** lab! During this lab, you will learn to do the following:
+This lab uses a host-backed terminal so `sbx` can create real sandboxes from inside the Labspace.
 
-- Learning Objective 1
-- Learning Objective 2
-- Learning Objective 3
-- Learning Objective 4
+First confirm the required tools are available:
 
+```bash
+docker version
+sbx version
+```
 
-## 🙋 What is a Labspace again?
+Initialize the sample app repository and validate both kits:
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis lacinia nisi sit amet auctor accumsan. Maecenas suscipit, libero quis ullamcorper pulvinar, dolor nisl vehicula orci, vel egestas arcu nibh eget enim. 
+```bash
+./setup.sh
+```
 
-Suspendisse potenti. Pellentesque eleifend eget ante eu egestas. 
+Sign in to SBX if needed:
 
-Nunc sit amet dapibus erat. Aliquam diam arcu, fringilla hendrerit metus sed, pellentesque fringilla lacus. 
+```bash
+sbx login
+```
 
-Nulla ornare nulla risus. Curabitur ut ipsum euismod, accumsan lorem eu, pretium lorem. Fusce imperdiet fermentum hendrerit.
+Pre-pull the Claude sandbox template so the live demo starts quickly:
 
+```bash
+sbx create --name prewarm claude /tmp && sbx rm -f prewarm
+```
 
+The demo project is in `demo/sample-app`, and the reusable SBX kits are in `kits/`.

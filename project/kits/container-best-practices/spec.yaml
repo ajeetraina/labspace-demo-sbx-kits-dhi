@@ -1,0 +1,32 @@
+schemaVersion: "1"
+kind: mixin
+name: container-best-practices
+displayName: Container Best Practices
+description: |
+  Teaches the agent to author Dockerfiles that follow well-known
+  container best practices (multi-stage, pinned versions, non-root
+  user, layer caching, .dockerignore, healthcheck, minimal base
+  images) and installs hadolint so the agent can lint its own work.
+
+network:
+  allowedDomains:
+    - github.com
+    - "*.githubusercontent.com"
+    - objects.githubusercontent.com
+
+commands:
+  install:
+    - command: |
+        set -eux
+        ARCH="$(uname -m)"
+        case "$ARCH" in
+          x86_64)  HL_ARCH=x86_64 ;;
+          aarch64|arm64) HL_ARCH=arm64 ;;
+          *) echo "unsupported arch $ARCH"; exit 1 ;;
+        esac
+        curl -sSfL -o /usr/local/bin/hadolint \
+          "https://github.com/hadolint/hadolint/releases/download/v2.12.0/hadolint-Linux-${HL_ARCH}"
+        chmod +x /usr/local/bin/hadolint
+        hadolint --version
+      user: "0"
+      description: Install hadolint Dockerfile linter

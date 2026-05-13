@@ -1,0 +1,29 @@
+schemaVersion: "1"
+kind: mixin
+name: dhi-scout
+displayName: DHI + Docker Scout
+description: |
+  Teaches the agent to use Docker Hardened Images (DHI) as base images
+  and to validate every image it builds with Docker Scout policy +
+  CVE checks before declaring the work done. Installs the `docker
+  scout` CLI plugin so the workflow runs locally inside the sandbox.
+
+network:
+  allowedDomains:
+    - github.com
+    - "*.githubusercontent.com"
+    - objects.githubusercontent.com
+    - api.scout.docker.com
+    - "*.docker.com"
+    - "*.docker.io"
+
+commands:
+  install:
+    - command: |
+        set -eu
+        mkdir -p /usr/local/lib/docker/cli-plugins
+        curl -sSfL https://raw.githubusercontent.com/docker/scout-cli/main/install.sh \
+          | sh -s -- -b /usr/local/lib/docker/cli-plugins
+        /usr/local/lib/docker/cli-plugins/docker-scout version || true
+      user: "0"
+      description: Install docker scout CLI plugin to system-wide cli-plugins dir

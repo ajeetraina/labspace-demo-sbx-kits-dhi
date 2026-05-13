@@ -1,18 +1,28 @@
-# Conclusion
+# Run Parallel Agents
 
-You’ve completed the **Labspace starter** lab!
+The sample app is initialized as a Git repository by `setup.sh`, so `sbx --branch` can create isolated worktrees.
 
-✅ You now know how to:
+Open two terminals and run one command in each:
 
-- Learning Objective 1
-- Learning Objective 2
-- Learning Objective 3
-- Learning Objective 4
+```bash
+cd demo/sample-app
+sbx run --name p3-claude --branch feat/dockerize claude \
+  --kit ../../kits/container-best-practices
+```
 
-## Next Steps
+```bash
+cd demo/sample-app
+sbx run --name p3-opencode --branch feat/tests opencode \
+  --kit ../../kits/container-best-practices
+```
 
-- Next step #1
-- Next step #2
-- Next step #3
+Ask the first agent to containerize the service. Ask the second agent to add a `/healthz` integration test using `node:test` and `supertest`.
 
-🎉 Well done!
+While they run, inspect the sandboxes and worktrees:
+
+```bash
+sbx ls
+git -C demo/sample-app worktree list
+```
+
+The worktrees are created under `demo/sample-app/.sbx/<sandbox>-worktrees/`, with slashes in branch names replaced by hyphens.

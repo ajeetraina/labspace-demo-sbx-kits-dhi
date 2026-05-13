@@ -1,25 +1,21 @@
 metadata:
   id: shelajev/labspace-demo-sbx-kits-dhi
   sourceRepo: github.com/shelajev/labspace-demo-sbx-kits-dhi
-  contentVersion: abcd123 # Will be filled in during CI
+  contentVersion: 0.1.0
 
-title: Labspace starter
+title: SBX Kits and Docker Hardened Images
 description: |
-  A basic template for creating a Labspace, including all of the boilerplate needed to write and publish a Labspace.
+  Build and verify a host-backed SBX demo that uses reusable kits to guide containerization, parallel agent work, and Docker Scout policy checks.
 
 sections:
-  - title: Introduction
+  - title: Setup the SBX Demo
     contentPath: 01-introduction.md
-  - title: Main Content 1
+  - title: Add Container Guardrails
     contentPath: 02-main-content.md
-  - title: Conclusion
+  - title: Run Parallel Agents
     contentPath: 03-conclusion.md
+  - title: Gate with DHI and Scout
+    contentPath: 04-dhi-scout.md
 
-# Services are used to add default tabs in the Labspace interface.
-# The IDE will always be present as a service, but you can add additional services as needed.
-# Icon values come from https://fonts.google.com/icons/
-services:
-  - id: app
-    url: http://localhost:3000
-    title: App
-    icon: anchor
+teardown_script: |
+  sbx rm --force prewarm kits-smoke p1-yolo p2-best-practices p3-claude p3-opencode p4-policy || true

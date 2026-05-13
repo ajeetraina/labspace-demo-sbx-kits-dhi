@@ -1,0 +1,13 @@
+{
+  "name": "leaddev-sample",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Tiny HTTP service used as a target for the sbx-kits demo.",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

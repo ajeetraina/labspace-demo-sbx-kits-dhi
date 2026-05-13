@@ -1,3 +1,18 @@
 include:
   - oci://dockersamples/labspace-content-dev
   - ./compose.override.yaml
+
+services:
+  # In development mode, keep ./project synced into the host-backed
+  # Labspace project directory used by the ttyd provider.
+  sync-service:
+    image: alpine
+    command: tail -f /dev/null
+    volumes:
+      - ${HOME}/.labspace/project:/project
+    develop:
+      watch:
+        - path: ./project
+          action: sync
+          target: /project
+          initial_sync: true
