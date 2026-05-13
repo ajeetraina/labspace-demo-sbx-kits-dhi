@@ -5,20 +5,17 @@ metadata:
 
 title: SBX Kits and Docker Hardened Images
 description: |
-  Compare plain SBX agent work with kit-guided containerization, parallel worktrees, and a DHI plus Docker Scout policy gate.
+  Compare plain SBX agent containerization with kit-guided best practices and a DHI plus Docker Scout policy gate.
 
 sections:
+  - title: Step 0: Prerequisites
+    contentPath: 00-prerequisites.md
   - title: Start with a Plain Sandbox
-    contentPath: 01-introduction.md
+    contentPath: 01-plain-sandbox.md
   - title: Add the Best Practices Kit
-    contentPath: 02-main-content.md
-  - title: Run Agents in Worktrees
-    contentPath: 03-conclusion.md
-  - title: Gate with DHI and Scout
-    contentPath: 04-dhi-scout.md
+    contentPath: 02-best-practices-kit.md
+  - title: Add the DHI and Scout Kit
+    contentPath: 03-dhi-scout.md
 
 teardown_script: |
-  PROJECT_DIR="${LABSPACE_PROJECT_DIR:-$HOME/.labspace/project}"
-  sbx rm --force prewarm kits-smoke p1-yolo p2-best-practices p3-claude p3-opencode p4-policy || true
-  rm -rf "$PROJECT_DIR/demo/sample-app/.sbx" || true
-  git -C "$PROJECT_DIR/demo/sample-app" worktree prune || true
+  sbx rm --force prewarm kits-smoke p1-yolo p2-best-practices p4-policy || true

@@ -1,8 +1,8 @@
-# Gate with DHI and Scout
+# Add the DHI and Scout Kit
 
-The final step adds organization-specific policy. The `dhi-scout` kit tells the agent to use Docker Hardened Images and to verify the resulting image with Docker Scout before declaring it shippable.
+The final step adds organization-specific policy. The `dhi-scout` kit tells the agent to use Docker Hardened Images and verify the image with Docker Scout before declaring it shippable.
 
-Inspect the DHI/Scout kit:
+Inspect the kit:
 
 ```bash
 cd ~/.labspace/project
@@ -36,7 +36,7 @@ docker scout policy app:dev
 
 The kit should block a “push” recommendation if policy fails. If policy passes, the agent should report the image, base image, size, Scout policy status, high/critical CVE count, and next action.
 
-You can smoke-test the installed kit tools directly in a throwaway sandbox:
+You can verify that both kit tools were installed in a throwaway sandbox:
 
 ```bash
 cd ~/.labspace/project
@@ -52,12 +52,10 @@ sbx exec kits-smoke bash -lc '
 '
 ```
 
-When finished, clean up the demo artifacts:
+Clean up when finished:
 
 ```bash
-sbx rm -f prewarm kits-smoke p1-yolo p2-best-practices p3-claude p3-opencode p4-policy
-rm -rf ~/.labspace/project/demo/sample-app/.sbx
-git -C ~/.labspace/project/demo/sample-app worktree prune
+sbx rm -f prewarm kits-smoke p1-yolo p2-best-practices p4-policy
 ```
 
-The Labspace teardown script also runs this cleanup when the lab is stopped.
+The Labspace teardown script also removes these demo sandboxes when the lab is stopped.
