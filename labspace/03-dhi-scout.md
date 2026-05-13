@@ -2,6 +2,13 @@
 
 The final step adds organization-specific policy. The `dhi-scout` kit tells the agent to use Docker Hardened Images and verify the image with Docker Scout before declaring it shippable.
 
+This step expects the Docker credentials from Step 0. The `dhi-scout`
+kit declares the `docker-hub-basic-auth` secret and uses the SBX proxy
+for Docker registry auth. It also expects the Docker Scout custom
+secrets from Step 0 for Scout's CLI environment variables. If you added
+or changed those secrets after creating `p4-policy`, remove and recreate
+that sandbox before continuing.
+
 Inspect the kit:
 
 ```bash
@@ -29,6 +36,7 @@ The expected workflow is:
 
 ```bash
 docker build -t app:dev .
+docker scout environment
 docker scout quickview app:dev
 docker scout cves --only-severity critical,high app:dev
 docker scout policy app:dev
@@ -45,6 +53,7 @@ sbx create --name kits-smoke claude ./demo/sample-app \
   --kit ./kits/dhi-scout
 
 sbx exec kits-smoke bash -lc '
+  env | grep "^DOCKER_SCOUT_" | sort &&
   hadolint --version &&
   docker scout version | sed -n "/^version:/p" &&
   ls ~/.claude/skills/ &&

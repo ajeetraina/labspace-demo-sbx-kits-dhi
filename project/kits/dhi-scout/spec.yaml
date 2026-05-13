@@ -13,9 +13,29 @@ network:
     - github.com
     - "*.githubusercontent.com"
     - objects.githubusercontent.com
+    - dhi.io
     - api.scout.docker.com
+    - registry.scout.docker.com
     - "*.docker.com"
     - "*.docker.io"
+  serviceDomains:
+    auth.docker.io: docker-hub-basic-auth
+    dhi.io: docker-hub-basic-auth
+    hub.docker.com: docker-hub-basic-auth
+  serviceAuth:
+    docker-hub-basic-auth:
+      headerName: Authorization
+      valueFormat: "Basic %s"
+
+credentials:
+  sources:
+    docker-hub-basic-auth:
+      env:
+        - DOCKERHUB_AUTH_B64
+
+environment:
+  proxyManaged:
+    - DOCKERHUB_AUTH_B64
 
 commands:
   install:
