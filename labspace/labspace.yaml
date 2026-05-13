@@ -18,4 +18,7 @@ sections:
     contentPath: 04-dhi-scout.md
 
 teardown_script: |
+  PROJECT_DIR="${LABSPACE_PROJECT_DIR:-$HOME/.labspace/project}"
   sbx rm --force prewarm kits-smoke p1-yolo p2-best-practices p3-claude p3-opencode p4-policy || true
+  rm -rf "$PROJECT_DIR/demo/sample-app/.sbx" || true
+  git -C "$PROJECT_DIR/demo/sample-app" worktree prune || true
