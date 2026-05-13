@@ -1,6 +1,6 @@
 # Run Parallel Agents
 
-The sample app is initialized as a Git repository by `setup.sh`, so `sbx --branch` can create isolated worktrees.
+The sample app was initialized as a Git repository in the prerequisites, so `sbx --branch` can create isolated worktrees.
 
 Open two terminals and run one command in each:
 

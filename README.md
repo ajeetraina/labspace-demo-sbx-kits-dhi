@@ -24,12 +24,7 @@ docker labspace version
 CONTENT_PATH=$PWD docker compose up --watch
 ```
 
-Inside the Labspace terminal:
-
-```bash
-./setup.sh
-sbx login
-```
+Inside the Labspace terminal, follow the Prerequisites section.
 
 ## Contents
 

@@ -1,24 +1,41 @@
-# Setup the SBX Demo
+# Prerequisites
 
 This lab uses a host-backed terminal so `sbx` can create real sandboxes from inside the Labspace.
 
-First confirm the required tools are available:
+Confirm the required tools are available:
 
 ```bash
 docker version
 sbx version
 ```
 
-Initialize the sample app repository and validate both kits:
+Validate both kits before creating sandboxes:
 
 ```bash
-./setup.sh
+sbx kit validate ./kits/container-best-practices
+sbx kit validate ./kits/dhi-scout
 ```
 
-Sign in to SBX if needed:
+Check whether SBX is signed in:
+
+```bash
+sbx diagnose
+```
+
+If the authentication check fails, sign in:
 
 ```bash
 sbx login
+```
+
+Initialize the sample app as a Git repository. Phase 3 uses `sbx --branch`, which creates Git worktrees and therefore requires the workspace to be a Git repo.
+
+```bash
+cd demo/sample-app
+git init -q -b main
+git add .
+git -c user.email=demo@example.com -c user.name=demo commit -q -m "init: leaddev sample app"
+cd ../..
 ```
 
 Pre-pull the Claude sandbox template so the live demo starts quickly:

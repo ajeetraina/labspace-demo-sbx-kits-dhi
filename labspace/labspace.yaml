@@ -8,7 +8,7 @@ description: |
   Build and verify a host-backed SBX demo that uses reusable kits to guide containerization, parallel agent work, and Docker Scout policy checks.
 
 sections:
-  - title: Setup the SBX Demo
+  - title: Prerequisites
     contentPath: 01-introduction.md
   - title: Add Container Guardrails
     contentPath: 02-main-content.md
