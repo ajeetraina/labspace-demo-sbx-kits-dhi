@@ -5,14 +5,14 @@ metadata:
 
 title: SBX Kits and Docker Hardened Images
 description: |
-  Build and verify a host-backed SBX demo that uses reusable kits to guide containerization, parallel agent work, and Docker Scout policy checks.
+  Compare plain SBX agent work with kit-guided containerization, parallel worktrees, and a DHI plus Docker Scout policy gate.
 
 sections:
-  - title: Prerequisites
+  - title: Start with a Plain Sandbox
     contentPath: 01-introduction.md
-  - title: Add Container Guardrails
+  - title: Add the Best Practices Kit
     contentPath: 02-main-content.md
-  - title: Run Parallel Agents
+  - title: Run Agents in Worktrees
     contentPath: 03-conclusion.md
   - title: Gate with DHI and Scout
     contentPath: 04-dhi-scout.md

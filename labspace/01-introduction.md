@@ -1,47 +1,52 @@
-# Prerequisites
+# Start with a Plain Sandbox
 
-This lab uses a host-backed terminal so `sbx` can create real sandboxes from inside the Labspace.
+This lab follows the SBX kits demo end to end. You will first let an agent containerize a small Node service in an isolated sandbox with no kit, then repeat the task with stronger kit-provided guidance.
 
-Confirm the required tools are available:
+Confirm the host-backed terminal has the tools this lab needs:
 
 ```bash
 docker version
 sbx version
 ```
 
-Validate both kits before creating sandboxes:
+Check SBX authentication:
+
+```bash
+sbx diagnose
+```
+
+If authentication fails, sign in:
+
+```bash
+sbx login
+```
+
+Validate the two kits packaged with the lab:
 
 ```bash
 sbx kit validate ./kits/container-best-practices
 sbx kit validate ./kits/dhi-scout
 ```
 
-Check whether SBX is signed in:
+Prepare the sample app as a Git repository. The worktree section later depends on this:
 
 ```bash
-sbx diagnose
-```
-
-If the authentication check fails, sign in:
-
-```bash
-sbx login
-```
-
-Initialize the sample app as a Git repository. Phase 3 uses `sbx --branch`, which creates Git worktrees and therefore requires the workspace to be a Git repo.
-
-```bash
-cd demo/sample-app
+cd ~/.labspace/project/demo/sample-app
 git init -q -b main
 git add .
 git -c user.email=demo@example.com -c user.name=demo commit -q -m "init: leaddev sample app"
-cd ../..
 ```
 
-Pre-pull the Claude sandbox template so the live demo starts quickly:
+Run the baseline sandbox without any kit:
 
 ```bash
-sbx create --name prewarm claude /tmp && sbx rm -f prewarm
+sbx run --name p1-yolo claude
 ```
 
-The demo project is in `demo/sample-app`, and the reusable SBX kits are in `kits/`.
+When Claude opens, ask:
+
+```text
+Containerize this app. Build the image and run it.
+```
+
+This first pass is intentionally unconstrained. Look for the quality bar the model chooses by itself: base image choice, whether it runs as root, whether it creates `.dockerignore`, and whether it lint-checks the Dockerfile.
