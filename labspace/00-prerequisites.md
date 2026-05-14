@@ -29,27 +29,39 @@ Prepare Docker credentials for the DHI and Scout step:
    Docker Hardened Images and run Docker Scout policy checks.
 3. Copy the token once. Docker will not show it again.
 
-Register the Docker username and PAT with SBX from the host-backed
-Labspace terminal. The first secret is declared by the `dhi-scout` kit
-and is used by the SBX proxy when the sandbox talks to Docker registry
-auth endpoints:
+Set the Docker username for the rest of this lab:
+
+::variableDefinition[dockerUsername]{prompt="Docker username"}
+
+:variableSetButton[Use olegselajev241]{variables="dockerUsername=olegselajev241"}
+
+Expert path: set the Docker username variable and register the Docker
+PAT-backed secrets in one terminal command. When prompted, paste the PAT
+and press Enter. Input is hidden.
 
 ```bash
-export DOCKERHUB_USERNAME="<your-docker-username>"
-read -rs DOCKERHUB_PAT
-printf '\n'
+DOCKERHUB_USERNAME="$$dockerUsername$$" bash <<'SCRIPT'
+set -euo pipefail
+
+if [ -z "${DOCKERHUB_USERNAME:-}" ] || [ "$DOCKERHUB_USERNAME" = "dockerUsername" ]; then
+  echo "Set the Docker username field in the lab instructions first." >&2
+  exit 1
+fi
+
+printf 'Paste Docker PAT for %s: ' "$DOCKERHUB_USERNAME" > /dev/tty
+IFS= read -r -s DOCKERHUB_PAT < /dev/tty
+printf '\n' > /dev/tty
+
+if [ -z "$DOCKERHUB_PAT" ]; then
+  echo "No PAT entered; nothing was changed." >&2
+  exit 1
+fi
 
 printf '%s:%s' "$DOCKERHUB_USERNAME" "$DOCKERHUB_PAT" \
   | base64 \
   | tr -d '\n' \
   | sbx secret set -g docker-hub-basic-auth
-```
 
-Docker Scout's CLI also supports Docker Hub username/password
-environment variables. Register those as custom secrets so the sandbox
-only sees placeholders:
-
-```bash
 for host in api.scout.docker.com registry.scout.docker.com hub.docker.com; do
   sbx secret set-custom -g \
     --host "$host" \
@@ -77,6 +89,7 @@ for host in api.scout.docker.com registry.scout.docker.com hub.docker.com; do
 done
 
 unset DOCKERHUB_PAT
+SCRIPT
 ```
 
 Global secrets are used for new sandboxes. If you already created
