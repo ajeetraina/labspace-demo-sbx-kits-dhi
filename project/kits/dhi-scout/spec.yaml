@@ -5,37 +5,22 @@ displayName: DHI + Docker Scout
 description: |
   Teaches the agent to use Docker Hardened Images (DHI) as base images
   and to validate every image it builds with Docker Scout policy +
-  CVE checks before declaring the work done. Installs the `docker
-  scout` CLI plugin so the workflow runs locally inside the sandbox.
+  CVE checks before declaring the work done. Installs the Docker Scout
+  CLI plugin plus the DHI CLI (`dhictl` and `docker dhi`) so the
+  workflow runs locally inside the sandbox.
 
 network:
   allowedDomains:
     - github.com
+    - api.github.com
     - "*.githubusercontent.com"
     - objects.githubusercontent.com
+    - release-assets.githubusercontent.com
     - dhi.io
     - api.scout.docker.com
     - registry.scout.docker.com
     - "*.docker.com"
     - "*.docker.io"
-  serviceDomains:
-    auth.docker.io: docker-hub-basic-auth
-    dhi.io: docker-hub-basic-auth
-    hub.docker.com: docker-hub-basic-auth
-  serviceAuth:
-    docker-hub-basic-auth:
-      headerName: Authorization
-      valueFormat: "Basic %s"
-
-credentials:
-  sources:
-    docker-hub-basic-auth:
-      env:
-        - DOCKERHUB_AUTH_B64
-
-environment:
-  proxyManaged:
-    - DOCKERHUB_AUTH_B64
 
 commands:
   install:
@@ -47,3 +32,66 @@ commands:
         /usr/local/lib/docker/cli-plugins/docker-scout version || true
       user: "0"
       description: Install docker scout CLI plugin to system-wide cli-plugins dir
+    - command: |
+        set -eu
+        DHICTL_VERSION=v0.0.3
+        case "$(uname -m)" in
+          x86_64)
+            DHI_ARCH=amd64
+            DHICTL_SHA256=7bf49639777d9db7c937d4039db2b4e46de408936b03e9a38ae0ceee2e4cfad7
+            ;;
+          aarch64|arm64)
+            DHI_ARCH=arm64
+            DHICTL_SHA256=f81037f1efa2999bd15599079962cd0627e6211815c2335575ab7530573218f7
+            ;;
+          *)
+            echo "unsupported arch $(uname -m)" >&2
+            exit 1
+            ;;
+        esac
+
+        tmp="$(mktemp)"
+        curl -sSfL -o "$tmp" \
+          "https://github.com/docker-hardened-images/dhictl/releases/download/${DHICTL_VERSION}/dhictl-linux-${DHI_ARCH}"
+        printf '%s  %s\n' "$DHICTL_SHA256" "$tmp" | sha256sum -c -
+        install -m 0755 "$tmp" /usr/local/bin/dhictl
+        ln -sf /usr/local/bin/dhictl /usr/local/lib/docker/cli-plugins/docker-dhi
+        rm -f "$tmp"
+
+        dhictl --version
+        docker dhi --version || true
+      user: "0"
+      description: Install Docker DHI CLI as dhictl and docker dhi
+    - command: |
+        set -eu
+        DOCKER_HUB_AUTH_PLACEHOLDER_B64="c2J4X2RvY2tlcl9odWJfdXNlcjpzYnhfZG9ja2VyX2h1Yl9wYXQ="
+        DHI_AUTH_PLACEHOLDER_B64="c2J4X2RoaV91c2VyOnNieF9kaGlfcGF0"
+
+        write_config() {
+          dir="$1"
+          owner="$2"
+          group="$3"
+
+          install -d -m 0700 "$dir"
+          cat > "$dir/config.json" <<JSON
+        {
+          "auths": {
+            "https://index.docker.io/v1/": {
+              "auth": "${DOCKER_HUB_AUTH_PLACEHOLDER_B64}"
+            },
+            "https://dhi.io": {
+              "auth": "${DHI_AUTH_PLACEHOLDER_B64}"
+            }
+          }
+        }
+        JSON
+          chown -R "$owner:$group" "$dir" 2>/dev/null || true
+          chmod 0600 "$dir/config.json"
+        }
+
+        write_config /root/.docker root root
+        if getent passwd agent >/dev/null 2>&1; then
+          write_config /home/agent/.docker agent agent
+        fi
+      user: "0"
+      description: Configure Docker auth placeholders for Docker Hub and dhi.io

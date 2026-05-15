@@ -1,14 +1,13 @@
 # sbx-kits-demo — a 10-minute LeadDev sandbox demo
 
-Four phases. Each one earns its place by adding **one** capability the
+Three phases. Each one earns its place by adding **one** capability the
 previous one didn't have.
 
-| # | Phase                              | What's new                                  | Time   |
-|---|------------------------------------|---------------------------------------------|--------|
-| 1 | Claude in sbx (yolo)               | Isolation                                   | 0–2:00 |
-| 2 | + `container-best-practices` kit   | Generic guardrails (every Dockerfile, ever) | 2–4:30 |
-| 3 | Parallel agents in worktrees       | Throughput                                  | 4:30–7 |
-| 4 | + `dhi-scout` kit                  | Custom policy gate, locally, before CI      | 7–10   |
+| # | Phase                              | What's new                                  | Time    |
+|---|------------------------------------|---------------------------------------------|---------|
+| 1 | Claude in sbx (yolo)               | Isolation                                   | 0-2:00  |
+| 2 | + `container-best-practices` kit   | Generic guardrails (every Dockerfile, ever) | 2-5:00  |
+| 3 | + `dhi-scout` kit                  | DHI catalog, DHI bases, Scout policy gate   | 5-10:00 |
 
 ## Layout
 
@@ -50,16 +49,15 @@ sbx kit validate ./kits/container-best-practices
 sbx kit validate ./kits/dhi-scout
 
 # 4. cd into the sample app and initialise it as a git repo
-#    (phase 3's --branch flag creates worktrees, so the sample app
-#    must be a git repo).
+#    so every sandbox starts from a clean project snapshot.
 cd demo/sample-app
 git init -q -b main
 git add .
 git -c user.email=demo@example.com -c user.name=demo commit -q -m "init: leaddev sample app"
 ```
 
-Optional but recommended: open three terminal panes side-by-side. Pane A
-for the host shell, panes B and C for the parallel agents in phase 3.
+Optional but recommended: keep one host terminal open for `sbx` commands
+and one lab browser pane open for the instructions.
 
 ---
 
@@ -137,63 +135,7 @@ crafting prompts.
 
 ---
 
-## Phase 3 — Parallel agents in git worktrees (4:30 – 7:00)
-
-**Talk track:** "One sandbox is good. Two cost nothing extra. The
-`--branch` flag spawns each agent in its own git worktree — isolated
-branch, isolated working tree, isolated container."
-
-Open two new panes. In each, from `demo/sample-app`:
-
-```sh
-# Pane B: Claude tackles a Dockerfile
-sbx run --name p3-claude --branch feat/dockerize claude \
-  --kit ../../kits/container-best-practices
-```
-
-```sh
-# Pane C: opencode tackles tests at the same time
-sbx run --name p3-opencode --branch feat/tests opencode \
-  --kit ../../kits/container-best-practices
-```
-
-In pane B prompt:
-
-> Containerize this service end-to-end.
-
-In pane C prompt:
-
-> Add a /healthz integration test using node:test and supertest.
-
-Both run simultaneously, in different worktrees, on different
-branches, with the same kit.
-
-While they run, in pane A:
-
-```sh
-sbx ls
-git worktree list      # the host sees both branches
-```
-
-When both finish, in pane A:
-
-```sh
-git -C .sbx/p3-claude-worktrees/feat-dockerize log --oneline
-git -C .sbx/p3-opencode-worktrees/feat-tests log --oneline
-```
-
-> Note: exact worktree path is shown in the `sbx run` output; the
-> command above matches the observed `.sbx/<sandbox>-worktrees/<branch>`
-> layout, where slashes in branch names are replaced with hyphens.
-
-**Land the message:** throughput goes up linearly with agents, and
-because each one is on a branch, you merge what you want and discard
-the rest. No "but it worked on my machine" — it didn't even run on
-your machine.
-
----
-
-## Phase 4 — Add `dhi-scout` kit: custom policy, before CI (7:00 – 10:00)
+## Phase 3 — Add `dhi-scout` kit: DHI catalog and policy before CI (5:00 – 10:00)
 
 **Talk track:** "Generic best practices are nice. But every org has
 its *own* policy: which base images are allowed, which CVE budget is
@@ -208,11 +150,14 @@ sbx kit inspect ./kits/dhi-scout
 sed -n '1,60p' ./kits/dhi-scout/files/home/.claude/skills/dhi-scout/SKILL.md
 ```
 
-Two things in this kit:
+Four things in this kit:
 
 1. **`docker scout` CLI** installed system-wide in the sandbox.
-2. **Skill** instructing Claude to (a) swap any base image to a
-   `docker.io/dhi/...` Docker Hardened Image and (b) run
+2. **DHI CLI** installed as both `dhictl` and `docker dhi`.
+3. **Docker registry auth placeholders** written to `~/.docker/config.json`;
+   Step 0 maps those placeholders to host-side SBX secrets.
+4. **Skill** instructing Claude to (a) query the DHI catalog, (b) swap
+   any base image to a DHI image, and (c) run
    `docker scout cves` + `docker scout policy` after every build,
    blocking "done" if policy fails.
 
@@ -230,15 +175,18 @@ Prompt:
 
 Expected behaviour:
 
-1. Claude rewrites the Dockerfile's `FROM` lines to `docker.io/dhi/node:...`.
-2. `docker build -t app:dev .`
-3. `docker scout quickview app:dev`
-4. `docker scout cves --only-severity critical,high app:dev`
-5. `docker scout policy app:dev`
-6. Reports the structured block from the skill:
+1. Claude checks `docker dhi catalog list --json`.
+2. Claude rewrites the Dockerfile's `FROM` lines to `dhi.io/node:...`,
+   or to your organization's Docker Hub DHI mirror.
+3. `docker build -t app:dev .`
+4. `docker scout quickview app:dev`
+5. `docker scout cves --only-severity critical,high app:dev`
+6. `docker scout policy app:dev`
+7. Reports the structured block from the skill:
    ```
    Image:        app:dev (sha256:...)
-   Base:         docker.io/dhi/node:20
+   Base:         dhi.io/node:20
+   DHI catalog:  docker dhi catalog get node
    Size:         34 MB
    Scout policy: PASS
    CVEs:         critical=0 high=0
@@ -260,8 +208,7 @@ laptop, before any code reaches CI.
 
 ```sh
 sbx ls
-sbx rm -f p1-yolo p2-best-practices p3-claude p3-opencode p4-policy
-# worktrees can stick around; remove with: git worktree remove <path>
+sbx rm -f p1-yolo p2-best-practices p4-policy kits-smoke
 ```
 
 ## What to take home
@@ -271,10 +218,8 @@ sbx rm -f p1-yolo p2-best-practices p3-claude p3-opencode p4-policy
   flag at create time, every agent picks it up.
 - **Mix-and-match**: generic kits (best practices, lint, formatting)
   next to org-specific kits (DHI, Scout policy, internal registries).
-- **Parallel** = `--branch`. Cost is `O(agents)`; conflict cost is
-  zero because every agent gets its own worktree.
 - **Shift policy left**: the same checks CI runs, the agent runs
-  first — locally, in the sandbox, before push.
+  first - locally, in the sandbox, before push.
 
 ## Files to read on stage if you have time
 
@@ -292,6 +237,9 @@ sbx create --name kits-smoke claude ./demo/sample-app \
   --kit ./kits/dhi-scout
 
 sbx exec kits-smoke bash -lc '
+  test -f ~/.docker/config.json &&
+  dhictl --version &&
+  docker dhi --version &&
   hadolint --version &&
   docker scout version | sed -n "/^version:/p" &&
   ls ~/.claude/skills/ &&
@@ -301,5 +249,6 @@ sbx exec kits-smoke bash -lc '
 sbx rm -f kits-smoke
 ```
 
-Expected: hadolint version, scout banner, `container-best-practices`
-and `dhi-scout` directories, the sample-app files in the workspace.
+Expected: DHI CLI version, hadolint version, scout banner,
+`container-best-practices` and `dhi-scout` directories, the sample-app
+files in the workspace.
