@@ -4,6 +4,13 @@ This is the Labspace wrapper for the SBX kits and Docker Hardened Images demo.
 
 The Labspace uses the host-backed `ttyd` provider from the Docker Labspace CLI plugin so `sbx` can create sandboxes with host access. The demo payload lives under `project/`.
 
+## Current State
+
+Read [HANDOFF.md](./HANDOFF.md) before resuming after a restart. It
+records the current implementation state, how to relaunch the Labspace,
+what has already been verified, and the remaining real DHI/Scout
+credential check.
+
 ## Local Development
 
 Install the Docker Labspace CLI plugin, then run:

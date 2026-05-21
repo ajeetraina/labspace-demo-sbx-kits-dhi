@@ -2,6 +2,11 @@
 
 This Labspace uses a host-backed terminal so `sbx` can create real sandboxes from your machine.
 
+If you are resuming after a machine restart, first read
+`~/ai-contrib/docker/labspace-demo-sbx-kits-dhi/HANDOFF.md`. It records
+the current implementation state, restart commands, verified checks, and
+the remaining real DHI/Scout credential test.
+
 Confirm Docker and SBX are available:
 
 ```bash
