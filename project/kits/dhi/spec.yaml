@@ -45,6 +45,7 @@ commands:
           "https://github.com/docker-hardened-images/dhictl/releases/download/${DHICTL_VERSION}/dhictl-linux-${DHI_ARCH}"
         printf '%s  %s\n' "$DHICTL_SHA256" "$tmp" | sha256sum -c -
         install -m 0755 "$tmp" /usr/local/bin/dhictl
+        mkdir -p /usr/local/lib/docker/cli-plugins
         ln -sf /usr/local/bin/dhictl /usr/local/lib/docker/cli-plugins/docker-dhi
         rm -f "$tmp"
 
