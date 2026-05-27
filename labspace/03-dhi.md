@@ -19,7 +19,7 @@ Remove the previous sandboxes before creating the DHI one. The same
 workspace cannot be owned by multiple named sandboxes at once:
 
 ```bash
-sbx rm -f p2-best-practices p4-dhi kits-smoke
+sbx rm -f p2-best-practices p4-dhi
 ```
 
 Inspect the kit:
@@ -136,7 +136,7 @@ and vulnerability count.
 Clean up when finished:
 
 ```bash
-sbx rm -f prewarm kits-smoke p1-yolo p2-best-practices p4-dhi
+sbx rm -f p1-yolo p2-best-practices p4-dhi
 ```
 
 The Labspace teardown script also removes these demo sandboxes when the
