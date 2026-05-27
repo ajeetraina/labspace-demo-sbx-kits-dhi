@@ -11,32 +11,39 @@ Inspect the kit:
 cd ~/.labspace/project
 ```
 
-Talking point: kits are just files in the project. They can be reviewed,
-versioned, and shared like any other repo artifact.
+Talking point: kits make sandboxes repeatable and shareable. One YAML
+file gives an agent the tools, credentials, network rules, and config it
+needs to do real work the same way every time.
 
 ```bash
 sbx kit inspect ./kits/container-best-practices
 ```
 
-Talking point: this shows the kit metadata and what SBX will attach to
-the sandbox. It is not a prompt pasted into Claude; it is a declarative
-bundle applied at sandbox creation.
+Talking point: this shows what SBX will attach to the sandbox. The kit
+is declarative startup configuration, applied with `--kit`; it is not a
+custom Docker image and it is not a long setup prompt pasted into
+Claude.
 
 ```bash
 cat ./kits/container-best-practices/spec.yaml
 ```
 
-Point attention to `commands.install`: the kit installs `hadolint`
-inside the sandbox. Also point at `network.allowedDomains`: the kit only
-opens the network locations needed to fetch that tool.
+Point attention to `commands.install`: the kit adds tools without
+rebuilding the agent image. Point at `network.allowedDomains`: the kit
+also defines what this agent setup can reach. Later, the DHI kit uses
+the same mechanism for credentials, where the real secret stays on the
+host and the sandbox only sees placeholders.
 
 ```bash
 cat ./kits/container-best-practices/files/home/.claude/skills/container-best-practices/SKILL.md
 ```
 
-Point attention to the skill rules: pinned base images, multi-stage
-builds, non-root runtime users, `.dockerignore`, and `hadolint` before
-declaring the work done.
+Point attention to the skill rules: this is the repeatable agent
+behavior the kit ships to every sandbox. For an individual developer,
+that means saving setup once. For a team, it means every engineer gets
+the same agent environment. For a platform team, it means one boundary
+for tools, network, and credentials. For a vendor or tool builder, it is
+the packaging format for an agent or capability.
 
 Start a fresh sandbox with the kit:
 
