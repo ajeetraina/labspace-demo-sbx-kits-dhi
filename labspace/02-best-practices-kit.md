@@ -69,6 +69,10 @@ prompt into that Claude session:
 Containerize this app. Build the image and run it.
 ```
 
+Talking point: call out the first lines of Claude output. You should
+see `Skill(container-best-practices)` and `Successfully loaded skill`.
+That is the visible handoff from the kit into the agent's behavior.
+
 Compare the result with the plain sandbox. The kit should push the agent toward:
 
 - A pinned base image instead of `latest`
