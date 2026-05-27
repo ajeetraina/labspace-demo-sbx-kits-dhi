@@ -5,10 +5,9 @@ the work can be resumed after a machine restart.
 
 ## Repository
 
-Labspace wrapper repo:
+Run these commands from this repository root:
 
 ```bash
-cd ~/ai-contrib/docker/labspace-demo-sbx-kits-dhi
 git status --short --branch
 git pull --ff-only
 ```
@@ -19,20 +18,8 @@ Remote:
 git@github.com:shelajev/labspace-demo-sbx-kits-dhi.git
 ```
 
-Last pushed implementation commit:
-
-```text
-a95584c docs: wire DHI CLI and SBX auth placeholders
-```
-
-The older standalone demo repo is adjacent:
-
-```bash
-cd ~/ai-contrib/docker/sbx-kits-demo
-```
-
-That repo is not the Labspace. The Labspace content is under
-`~/ai-contrib/docker/labspace-demo-sbx-kits-dhi/project`.
+The Labspace payload is under `project/`. The rendered lab instructions
+are under `labspace/`.
 
 ## What This Labspace Is
 
@@ -42,22 +29,22 @@ stronger SBX workflows:
 1. Plain SBX sandbox: Claude containerizes the app with no extra policy.
 2. SBX sandbox with `container-best-practices`: the kit installs
    hadolint and gives the agent Dockerfile guardrails.
-3. SBX sandbox with `container-best-practices` plus `dhi-scout`: the kit
-   installs Docker Scout, installs the DHI CLI, seeds Docker auth
-   placeholders, and tells the agent to use DHI images and run Scout
-   policy before calling the image shippable.
+3. SBX sandbox with `container-best-practices` plus `dhi`: the kit
+   installs the Docker Hardened Images CLI, seeds Docker auth
+   placeholders, and tells the agent to move the app to DHI base images.
 
-Worktrees and parallel agents are no longer part of this Labspace flow.
+For the final evidence view, use the already pushed baseline and DHI
+image tags in Docker Hub / Docker Scout Dashboard. The demo does not
+depend on running `docker scout` inside the sandbox.
 
 ## Restart Commands
 
 After reboot, start Docker Desktop first.
 
-Then start the Labspace from the wrapper repo:
+Then start the Labspace from this repository root:
 
 ```bash
-cd ~/ai-contrib/docker/labspace-demo-sbx-kits-dhi
-SHELL=$PWD/bin/labspace-shell CONTENT_PATH=$PWD docker compose up --watch
+SHELL=$PWD/bin/labspace-shell CONTENT_PATH=$PWD docker labspace author
 ```
 
 Open:
@@ -70,7 +57,7 @@ Terminal: http://localhost:8085
 If the Labspace CLI plugin is missing, reinstall it:
 
 ```bash
-gh release download v0.4.0 \
+gh release download v0.6.0 \
   --repo docker/docker-labspace-cli \
   --pattern docker-labspace-darwin-arm64 \
   --pattern checksums.sha256
@@ -81,67 +68,65 @@ ln -sf ~/.docker/cli-plugins/docker-labspace ~/.local/bin/labspace
 docker labspace version
 ```
 
-## Current Verification Status
+If the Labspace base content pull returns `401 Unauthorized`, log in to
+Docker Hub on the host with a PAT, then retry:
 
-Already verified locally:
+```bash
+docker login
+```
+
+## Current Verification
+
+Run these checks from this repository root after edits:
 
 ```bash
 sbx kit validate ./project/kits/container-best-practices
-sbx kit validate ./project/kits/dhi-scout
-CONTENT_PATH=$PWD docker compose config >/tmp/labspace-demo-compose-config.yaml
+sbx kit validate ./project/kits/dhi
 git diff --check
 ```
 
-Also verified with a throwaway sandbox:
+When the host can pull the Labspace base content, also run:
+
+```bash
+CONTENT_PATH=$PWD docker compose config >/tmp/labspace-demo-compose-config.yaml
+```
+
+Optional smoke test:
 
 ```bash
 sbx create --name kits-smoke claude ./project/demo/sample-app \
   --kit ./project/kits/container-best-practices \
-  --kit ./project/kits/dhi-scout
+  --kit ./project/kits/dhi
 
 sbx exec kits-smoke bash -lc '
   test -f ~/.docker/config.json &&
   dhictl --version &&
   docker dhi --version &&
   hadolint --version &&
-  docker scout version | sed -n "/^version:/p" &&
   ls ~/.claude/skills/ &&
   ls "$WORKSPACE_DIR"
 '
 ```
 
-The observed versions were:
+Expected installed DHI tooling:
 
 ```text
 dhictl version v0.0.3
 dhi version v0.0.3
-Haskell Dockerfile Linter 2.12.0
-docker scout version v1.20.4
 ```
 
-The kit also created Docker auth placeholder configs for both the
-default `agent` user and `root`.
+## DHI Secrets
 
-## What Is Left
+Step 0 in the Labspace page registers Docker Hub and `dhi.io` auth
+placeholders with `sbx secret set-custom`. Use a Docker Hub PAT as the
+registry password. Do not paste the real PAT into the sandbox.
 
-The code and Labspace docs are implemented and pushed. The remaining
-check is real authenticated DHI and Scout access using a Docker PAT from
-an account that has DHI/Scout entitlement.
-
-Run Step 0 in the Labspace page after restart. It asks for the Docker
-username and then prompts for a Docker PAT. Use the PAT as the registry
-password; do not paste the real PAT into the sandbox.
-
-Then recreate the DHI sandbox because global SBX secrets are used when
-new sandboxes are created:
+Global secrets are used for new sandboxes. If you change the secrets,
+recreate the DHI sandbox:
 
 ```bash
 cd ~/.labspace/project
-sbx rm -f kits-smoke p4-policy
-
-sbx create --name kits-smoke claude ./demo/sample-app \
-  --kit ./kits/container-best-practices \
-  --kit ./kits/dhi-scout
+sbx rm -f kits-smoke p4-dhi
 ```
 
 Check real authenticated DHI access:
@@ -149,41 +134,38 @@ Check real authenticated DHI access:
 ```bash
 sbx exec kits-smoke bash -lc '
   docker dhi catalog list --json >/tmp/dhi-catalog.json &&
-  docker pull dhi.io/node:20
+  docker pull dhi.io/node:24-debian13
 '
 ```
 
 If this returns `401 Unauthorized`, the install is still fine. It means
 the PAT is missing, expired, does not have access to DHI, or the account
 uses a Docker Hub organization mirror instead of direct `dhi.io` pulls.
-In that case, query the DHI CLI/catalog and use the mirrored image
-reference for the organization.
+Use the mirrored image reference shown by the DHI CLI or by the
+organization setup.
 
-After the real-auth smoke test passes, run the actual final demo sandbox:
+## Demo Images
 
-```bash
-cd ~/.labspace/project/demo/sample-app
-sbx run --name p4-policy claude \
-  --kit ../../kits/container-best-practices \
-  --kit ../../kits/dhi-scout
-```
-
-Prompt:
+These tags are available for the Hub / Scout Dashboard comparison:
 
 ```text
-Harden the image and confirm it's shippable under our Scout policy.
+docker.io/olegselajev241/todo-demo-application:sbx-dhi-baseline
+docker.io/olegselajev241/todo-demo-application:sbx-dhi-dhi
 ```
 
-Expected agent workflow:
+Useful views:
 
-```bash
-docker dhi catalog list --json
-docker dhi catalog get node --json
-docker build -t app:dev .
-docker scout environment
-docker scout quickview app:dev
-docker scout cves --only-severity critical,high app:dev
-docker scout policy app:dev
+```text
+https://hub.docker.com/r/olegselajev241/todo-demo-application/tags?name=sbx-dhi
+https://scout.docker.com/org/olegselajev241/images/docker.io/olegselajev241/todo-demo-application
+```
+
+Observed local Scout comparison from the pushed repo:
+
+```text
+baseline: node:24-trixie-slim, 104 MB, 323 packages, 0C 0H 3M 22L 3?, policy FAILED
+DHI:      dhi.io/node:24-debian13, 43 MB, 96 packages, 0C 0H 0M 8L, policy SUCCESS
+delta:    -61 MB, -227 packages, -20 vulnerabilities, default non-root improved
 ```
 
 ## Cleanup
@@ -191,14 +173,14 @@ docker scout policy app:dev
 Manual cleanup:
 
 ```bash
-sbx rm -f prewarm kits-smoke p1-yolo p2-best-practices p4-policy
+sbx rm -f prewarm kits-smoke p1-yolo p2-best-practices p4-dhi
 ```
 
 The Labspace teardown script also removes those demo sandboxes:
 
 ```yaml
 teardown_script: |
-  sbx rm --force prewarm kits-smoke p1-yolo p2-best-practices p4-policy || true
+  sbx rm --force prewarm kits-smoke p1-yolo p2-best-practices p4-dhi || true
 ```
 
 ## Notes
@@ -207,9 +189,6 @@ teardown_script: |
   the host-backed Labspace terminal provider.
 - `compose.yaml` includes `sync-service`, which syncs `project/` into
   `~/.labspace/project` for development.
-- The `dhi-scout` kit intentionally does not store the real Docker PAT
-  in the sandbox. It writes fake Docker auth placeholders and relies on
-  host-side `sbx secret set-custom` replacements.
-- The direct unauthenticated `docker dhi catalog list --json` check was
-  tried once and returned `401 Unauthorized`, which is expected without
-  the Step 0 PAT-backed secrets.
+- The `dhi` kit intentionally does not store the real Docker PAT in the
+  sandbox. It writes fake Docker auth placeholders and relies on
+  host-side `sbx secret set-custom` replacements for registry requests.

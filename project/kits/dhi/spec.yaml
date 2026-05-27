@@ -1,13 +1,11 @@
 schemaVersion: "1"
 kind: mixin
-name: dhi-scout
-displayName: DHI + Docker Scout
+name: dhi
+displayName: Docker Hardened Images
 description: |
-  Teaches the agent to use Docker Hardened Images (DHI) as base images
-  and to validate every image it builds with Docker Scout policy +
-  CVE checks before declaring the work done. Installs the Docker Scout
-  CLI plugin plus the DHI CLI (`dhictl` and `docker dhi`) so the
-  workflow runs locally inside the sandbox.
+  Teaches the agent to use Docker Hardened Images (DHI) as base images.
+  Installs the DHI CLI (`dhictl` and `docker dhi`) and writes Docker
+  auth placeholders for Docker Hub and dhi.io.
 
 network:
   allowedDomains:
@@ -17,21 +15,13 @@ network:
     - objects.githubusercontent.com
     - release-assets.githubusercontent.com
     - dhi.io
-    - api.scout.docker.com
-    - registry.scout.docker.com
+    - api.docker.com
+    - hub.docker.com
     - "*.docker.com"
     - "*.docker.io"
 
 commands:
   install:
-    - command: |
-        set -eu
-        mkdir -p /usr/local/lib/docker/cli-plugins
-        curl -sSfL https://raw.githubusercontent.com/docker/scout-cli/main/install.sh \
-          | sh -s -- -b /usr/local/lib/docker/cli-plugins
-        /usr/local/lib/docker/cli-plugins/docker-scout version || true
-      user: "0"
-      description: Install docker scout CLI plugin to system-wide cli-plugins dir
     - command: |
         set -eu
         DHICTL_VERSION=v0.0.3
@@ -64,8 +54,12 @@ commands:
       description: Install Docker DHI CLI as dhictl and docker dhi
     - command: |
         set -eu
-        DOCKER_HUB_AUTH_PLACEHOLDER_B64="c2J4X2RvY2tlcl9odWJfdXNlcjpzYnhfZG9ja2VyX2h1Yl9wYXQ="
-        DHI_AUTH_PLACEHOLDER_B64="c2J4X2RoaV91c2VyOnNieF9kaGlfcGF0"
+        cat > /usr/local/bin/configure-dhi-auth <<'SH'
+        #!/usr/bin/env sh
+        set -eu
+
+        DOCKER_HUB_AUTH_PLACEHOLDER_B64="c2J4X2RvY2tlcl9odWJfdXNlcjpzYnhfZG9ja2VyX2h1Yl9wYXQK"
+        DHI_AUTH_PLACEHOLDER_B64="c2J4X2RoaV91c2VyOnNieF9kaGlfcGF0Cg=="
 
         write_config() {
           dir="$1"
@@ -73,18 +67,18 @@ commands:
           group="$3"
 
           install -d -m 0700 "$dir"
-          cat > "$dir/config.json" <<JSON
+          cat > "$dir/config.json" <<EOF
         {
           "auths": {
             "https://index.docker.io/v1/": {
-              "auth": "${DOCKER_HUB_AUTH_PLACEHOLDER_B64}"
+              "auth": "$DOCKER_HUB_AUTH_PLACEHOLDER_B64"
             },
             "https://dhi.io": {
-              "auth": "${DHI_AUTH_PLACEHOLDER_B64}"
+              "auth": "$DHI_AUTH_PLACEHOLDER_B64"
             }
           }
         }
-        JSON
+        EOF
           chown -R "$owner:$group" "$dir" 2>/dev/null || true
           chmod 0600 "$dir/config.json"
         }
@@ -93,5 +87,13 @@ commands:
         if getent passwd agent >/dev/null 2>&1; then
           write_config /home/agent/.docker agent agent
         fi
+        SH
+        chmod +x /usr/local/bin/configure-dhi-auth
+        /usr/local/bin/configure-dhi-auth
       user: "0"
       description: Configure Docker auth placeholders for Docker Hub and dhi.io
+  startup:
+    - command:
+        - /usr/local/bin/configure-dhi-auth
+      user: "0"
+      description: Reconcile Docker auth after registry secrets are injected

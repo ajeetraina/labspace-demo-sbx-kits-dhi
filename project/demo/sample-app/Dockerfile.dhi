@@ -1,0 +1,26 @@
+FROM dhi.io/node:24-debian13-dev AS build
+
+WORKDIR /usr/src/app
+
+COPY package*.json ./
+RUN npm ci
+
+COPY tsconfig.json ./
+COPY src ./src
+
+RUN npm run build \
+  && npm prune --omit=dev \
+  && npm cache clean --force
+
+FROM dhi.io/node:24-debian13 AS production
+
+ENV NODE_ENV=production
+WORKDIR /usr/src/app
+
+COPY --from=build /usr/src/app/node_modules ./node_modules
+COPY --from=build /usr/src/app/dist ./dist
+COPY public ./public
+COPY package*.json ./
+
+EXPOSE 3000
+CMD ["node", "dist/server.js"]

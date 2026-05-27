@@ -5,7 +5,7 @@ metadata:
 
 title: SBX Kits and Docker Hardened Images
 description: |
-  Compare plain SBX agent containerization with kit-guided best practices and a DHI plus Docker Scout policy gate.
+  Compare plain SBX agent containerization with kit-guided best practices and Docker Hardened Images.
 
 sections:
   - title: "Step 0: Prerequisites"
@@ -14,8 +14,8 @@ sections:
     contentPath: 01-plain-sandbox.md
   - title: Add the Best Practices Kit
     contentPath: 02-best-practices-kit.md
-  - title: Add the DHI and Scout Kit
-    contentPath: 03-dhi-scout.md
+  - title: Add the DHI Kit
+    contentPath: 03-dhi.md
 
 teardown_script: |
-  sbx rm --force prewarm kits-smoke p1-yolo p2-best-practices p4-policy || true
+  sbx rm --force prewarm kits-smoke p1-yolo p2-best-practices p4-dhi || true

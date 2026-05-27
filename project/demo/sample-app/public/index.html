@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>LeadDev Platform Radar</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <section class="hero">
+        <div>
+          <p class="eyebrow">Container policy demo</p>
+          <h1>Platform Radar</h1>
+          <p class="lede">
+            A small Node.js service catalog with API routes, static assets,
+            runtime metrics, and a build step for containerization demos.
+          </p>
+        </div>
+        <dl class="summary">
+          <div>
+            <dt>Services</dt>
+            <dd id="service-count">-</dd>
+          </div>
+          <div>
+            <dt>Open CVEs</dt>
+            <dd id="cve-count">-</dd>
+          </div>
+          <div>
+            <dt>High risk</dt>
+            <dd id="risk-count">-</dd>
+          </div>
+        </dl>
+      </section>
+
+      <section>
+        <div class="section-heading">
+          <h2>Service Catalog</h2>
+          <span id="generated-at"></span>
+        </div>
+        <div id="services" class="service-grid"></div>
+      </section>
+    </main>
+    <script src="/app.js" defer></script>
+  </body>
+</html>

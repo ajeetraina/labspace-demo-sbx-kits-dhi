@@ -10,7 +10,10 @@ non-negotiable defaults; deviate only if the user explicitly asks.
 
 ## 1. Pin everything
 - Pin the base image by **major.minor** at minimum, ideally by digest:
-  `FROM node:20.11-alpine` or `FROM node@sha256:...`. Never `:latest`.
+  `FROM node:24-trixie-slim` or `FROM node@sha256:...`. Never `:latest`.
+- For this repository's Node demo app, prefer `node:24-trixie-slim`
+  unless the user asks for DHI. That keeps optional Docker Scout
+  comparisons aligned with Docker's DHI Node lab.
 - Pin OS packages (`apt-get install -y --no-install-recommends pkg=1.2.3`)
   when reproducibility matters.
 
@@ -18,7 +21,7 @@ non-negotiable defaults; deviate only if the user explicitly asks.
 - Separate `build` and `runtime` stages. The final image must contain
   only what is needed at runtime — no compilers, no dev dependencies,
   no source maps unless required.
-- Name your stages: `FROM node:20.11-alpine AS build`.
+- Name your stages: `FROM node:24-trixie-slim AS build`.
 
 ## 3. Pick a minimal base
 Prefer in this order: distroless → alpine → -slim → full. Justify a
