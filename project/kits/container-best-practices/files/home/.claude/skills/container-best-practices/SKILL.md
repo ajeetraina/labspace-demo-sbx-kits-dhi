@@ -11,9 +11,10 @@ non-negotiable defaults; deviate only if the user explicitly asks.
 ## 1. Pin everything
 - Pin the base image by **major.minor** at minimum, ideally by digest:
   `FROM node:24-trixie-slim` or `FROM node@sha256:...`. Never `:latest`.
-- For this repository's Node demo app, prefer `node:24-trixie-slim`
-  unless the user asks for DHI. That keeps optional Docker Scout
-  comparisons aligned with Docker's DHI Node lab.
+- If a Docker Hardened Images (DHI) skill or kit is also installed,
+  defer base image selection to that skill and use the DHI build/runtime
+  bases it specifies. Otherwise, for this repository's Node demo app,
+  prefer `node:24-trixie-slim`.
 - Pin OS packages (`apt-get install -y --no-install-recommends pkg=1.2.3`)
   when reproducibility matters.
 

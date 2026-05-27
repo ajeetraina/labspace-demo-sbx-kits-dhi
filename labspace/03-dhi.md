@@ -58,6 +58,12 @@ image, use `dhi.io/node:24-debian13-dev` and
 `dhi.io/node:24-debian13` for this Node demo, and collect evidence for
 Hub / Scout Dashboard review after push.
 
+Talking point: this is intentionally the same user task as before. The
+difference is the kit stack. The DHI skill says that, when this kit is
+installed, it has base-image precedence for containerization tasks, so
+the agent should know about DHI without the user having to spell it out
+in the prompt.
+
 Run a fresh sandbox with both kits:
 
 ```bash
@@ -67,11 +73,11 @@ sbx run --name p4-dhi claude \
   --kit ../../kits/dhi
 ```
 
-When Claude opens, use the run button on this block to paste the DHI
-prompt into that Claude session:
+When Claude opens, use the run button on this block to paste the same
+prompt as before into that Claude session:
 
 ```text
-Harden the image with Docker Hardened Images and report the evidence I can show in Docker Hub.
+Containerize this app. Build the image and run it.
 ```
 
 The expected workflow is:

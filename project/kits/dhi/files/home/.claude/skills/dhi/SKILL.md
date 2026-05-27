@@ -1,14 +1,19 @@
 ---
 name: dhi
-description: Use Docker Hardened Images (DHI) as build and runtime base images, then collect local image evidence for Docker Hub review. Use this skill whenever the user asks to containerize, harden, or prepare an application image with Docker Hardened Images.
+description: Use Docker Hardened Images (DHI) as build and runtime base images, then collect local image evidence for Docker Hub review. When this skill is installed, use it for containerization, Dockerfile, image hardening, or application image preparation tasks; it takes base-image precedence over generic container best-practices guidance.
 ---
 
 # Docker Hardened Images
 
 This skill turns "the Dockerfile builds" into "the image uses hardened
-base images and has useful evidence". It runs **after** you have
-produced a working Dockerfile and **before** you push an image for Hub
-review.
+base images and has useful evidence". When this skill is installed, use
+it during initial Dockerfile authoring for normal containerization
+requests, not only when the user explicitly says "DHI".
+
+If another skill also applies, such as `container-best-practices`, keep
+its generic Dockerfile guidance but let this DHI skill decide the build
+and runtime base images. Do not choose Docker Official Images when a DHI
+equivalent exists.
 
 ## 1. Use DHI for every base image
 
