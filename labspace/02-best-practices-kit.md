@@ -73,58 +73,26 @@ Talking point: call out the first lines of Claude output. You should
 see `Skill(container-best-practices)` and `Successfully loaded skill`.
 That is the visible handoff from the kit into the agent's behavior.
 
-Compare the result with the plain sandbox. The kit should push the agent toward:
-
-- A pinned base image instead of `latest`
-- A multi-stage Dockerfile
-- A non-root runtime user
-- A `.dockerignore`
-- `hadolint Dockerfile` before completion
-
 ## Show the Kit in Action
 
 You may not need extra commands here. The strongest proof is often in
 Claude's own transcript:
 
 - It loads `Skill(container-best-practices)`.
-- It says the existing Dockerfile needs a better base image, non-root
-  user, and healthcheck.
-- It rewrites `FROM node:20-alpine` to a pinned
-  `node:24-trixie-slim` build/runtime pair.
-- It adds a dedicated user and `USER appuser`.
-- It improves `.dockerignore`.
-- It runs `hadolint Dockerfile` and gets no output.
+- It reads the shared skill that the kit installed.
+- It changes its plan based on that shared guidance.
+- It uses the tool the kit installed, for example `hadolint Dockerfile`.
 
-If you want a quick live check after Claude finishes, use these:
-
-```text
-! grep -nE "^[[:space:]]*FROM[[:space:]]" Dockerfile
-```
-
-Talking point: every `FROM` line is a build stage. The skill tells the
-agent to use separate build and runtime stages, and to avoid `latest`.
-
-```text
-! grep -nE "^[[:space:]]*USER[[:space:]]" Dockerfile || echo "no USER directive"
-```
-
-Talking point: this is the visible non-root check. A good kit-guided
-result should switch away from root before `CMD`.
-
-```text
-! test -f .dockerignore && cat .dockerignore || echo "missing .dockerignore"
-```
-
-Talking point: `.dockerignore` is both performance and safety: smaller
-build context, fewer accidental secrets or local artifacts copied into
-the image.
+If you want one quick live check after Claude finishes, use this:
 
 ```text
 ! hadolint Dockerfile
 ```
 
-Talking point: this is the clearest proof the kit changed the sandbox.
-The plain sandbox did not have `hadolint`; this one does, and the skill
-tells the agent to run it before completion.
+Talking point: the important part is not the specific Dockerfile advice.
+The important part is that the sandbox got the same tool and the same
+agent guidance from a reusable kit. That setup can be shared with a
+teammate, pinned in git, pushed to an OCI registry, or owned by a
+platform team.
 
 The lesson: a kit is reusable, versioned guidance. It gives every agent the same baseline without rewriting prompts by hand.
