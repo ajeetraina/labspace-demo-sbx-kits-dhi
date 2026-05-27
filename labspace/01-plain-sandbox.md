@@ -85,9 +85,10 @@ Inspect the Dockerfile:
 ! grep -nE "^[[:space:]]*FROM[[:space:]]" Dockerfile
 ```
 
-```text
-! grep -cE "^[[:space:]]*FROM[[:space:]]" Dockerfile
-```
+Talking point: every `FROM` line is a build stage. One line means a
+single-stage image; two or more lines means the agent chose a
+multi-stage build. Also call out whether the base is pinned, `latest`,
+slim, alpine, or something else.
 
 ```text
 ! grep -nE "^[[:space:]]*USER[[:space:]]" Dockerfile || echo "no USER directive"
