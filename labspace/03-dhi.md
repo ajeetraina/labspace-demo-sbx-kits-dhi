@@ -26,9 +26,37 @@ Inspect the kit:
 
 ```bash
 cd ~/.labspace/project
-sbx kit inspect ./kits/dhi
-sed -n '1,100p' ./kits/dhi/files/home/.claude/skills/dhi/SKILL.md
 ```
+
+Talking point: this kit is a second mixin layered onto the same agent.
+The best-practices kit handles generic container quality; the DHI kit
+adds organization-specific base image policy and registry access.
+
+```bash
+sbx kit inspect ./kits/dhi
+```
+
+Point attention to the kit name, display name, and install/startup
+steps. This is what SBX applies when `--kit ../../kits/dhi` is added to
+the sandbox command.
+
+```bash
+cat ./kits/dhi/spec.yaml
+```
+
+Point attention to the DHI CLI install, `network.allowedDomains`, and
+`configure-dhi-auth`. The important demo message is that the sandbox
+gets DHI tooling and placeholder auth config at startup, while the real
+Docker credential stays host-managed.
+
+```bash
+cat ./kits/dhi/files/home/.claude/skills/dhi/SKILL.md
+```
+
+Point attention to the skill rules: use DHI for every build/runtime base
+image, use `dhi.io/node:24-debian13-dev` and
+`dhi.io/node:24-debian13` for this Node demo, and collect evidence for
+Hub / Scout Dashboard review after push.
 
 Run a fresh sandbox with both kits:
 
