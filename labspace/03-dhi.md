@@ -80,70 +80,58 @@ prompt as before into that Claude session:
 Containerize this app. Build the image and run it.
 ```
 
-The expected workflow is:
+Talking point: call out the first lines of Claude output. You should
+see `Skill(dhi)` and `Successfully loaded skill`. This is the proof that
+the same user prompt is now interpreted through the DHI kit.
 
-```bash
-docker dhi catalog list --json
-docker dhi catalog get node --json
-docker build -t app:baseline -f Dockerfile.baseline .
-docker build -t app:dhi -f Dockerfile.dhi .
-docker image inspect app:baseline app:dhi --format '{{join .RepoTags ","}} {{.Size}} bytes {{.Config.User}}'
-```
-
-The kit should use `dhi.io/node:24-debian13-dev` for build stages and
-`dhi.io/node:24-debian13` for the final runtime stage in this Node demo.
-If the account uses a DHI Select or Enterprise mirror, use the Docker
-Hub organization namespace shown by the DHI CLI or your org
-configuration.
-
-You can verify that both kit tools were installed in a throwaway sandbox:
-
-```bash
-cd ~/.labspace/project
-sbx create --name kits-smoke claude ./demo/sample-app \
-  --kit ./kits/container-best-practices \
-  --kit ./kits/dhi
-
-sbx exec kits-smoke bash -lc '
-  test -f ~/.docker/config.json &&
-  grep -q "c2J4X2RvY2tlcl9odWJfdXNlcjpzYnhfZG9ja2VyX2h1Yl9wYXQK" ~/.docker/config.json &&
-  grep -q "c2J4X2RoaV91c2VyOnNieF9kaGlfcGF0Cg==" ~/.docker/config.json &&
-  hadolint --version &&
-  dhictl --version &&
-  docker dhi --version &&
-  ls ~/.claude/skills/ &&
-  ls "$WORKSPACE_DIR"
-'
-```
-
-After Step 0 secrets are configured, you can also test real
-authenticated DHI access with an image your account can pull:
-
-```bash
-sbx exec kits-smoke bash -lc '
-  docker dhi catalog list --json >/tmp/dhi-catalog.json &&
-  docker pull dhi.io/node:24-debian13
-'
-```
-
-If that pull is denied, check whether your DHI access is through a
-Docker Hub organization mirror instead of direct `dhi.io` access, then
-pull the mirrored image reference shown by `docker dhi`.
-
-For the shareable evidence view, open these after the image tags are
-pushed:
+In the transcript, point out that the agent uses the DHI bases:
 
 ```text
-https://hub.docker.com/r/olegselajev241/todo-demo-application/tags?name=sbx-dhi
-https://scout.docker.com/org/olegselajev241/images/docker.io/olegselajev241/todo-demo-application
+dhi.io/node:24-debian13-dev
+dhi.io/node:24-debian13
 ```
 
-Known demo tags:
+The local sandbox proves the agent can use the DHI policy. For the
+shareable proof, switch to Docker Hub and Docker Scout. Open the Hub
+tags page and point at the baseline and DHI tags:
+
+```text
+https://hub.docker.com/repository/docker/olegselajev241/todo-demo-application/tags
+```
+
+Use these two tags for comparison:
 
 ```text
 docker.io/olegselajev241/todo-demo-application:sbx-dhi-baseline
 docker.io/olegselajev241/todo-demo-application:sbx-dhi-dhi
 ```
+
+On Hub, show the tag size difference. Then open the Docker Scout image
+view:
+
+```text
+https://scout.docker.com/reports/org/olegselajev241/images/host/hub.docker.com/repo/olegselajev241%2Ftodo-demo-application
+```
+
+In Scout, select `sbx-dhi-baseline` and `sbx-dhi-dhi`, then click
+Compare. Use the comparison to show the vulnerability and package-count
+change. If you need a direct comparison link for this prepared demo,
+open:
+
+```text
+https://scout.docker.com/reports/org/olegselajev241/images/compare/host/hub.docker.com/repo/olegselajev241%2Ftodo-demo-application/tag/sbx-dhi-baseline/digest/sha256%3A126733d8537c6b0a13ce66f20ac7010f801235e96d44cc59dfce5da70debbe5b/to/host/hub.docker.com/repo/olegselajev241%2Ftodo-demo-application/tag/sbx-dhi-dhi/digest/sha256%3A39af4388477e340ccaab07a5795d868b6e7db048dc38e30fb5629a90d87c1b3e/vulnerabilities
+```
+
+Talking point: do not make this section about in-sandbox Scout CLI
+auth. The demo value is that the same prompt plus a different kit stack
+produces a DHI-based image, and the pushed tags give a shareable Hub /
+Scout view for size, packages, and vulnerabilities.
+
+If Scout policy cards show `No data` for some base-image checks on the
+DHI tag, do not dwell on that as the core proof. Those cards depend on
+the policy metadata Scout has for that tag. The comparison view is the
+stable demo artifact: baseline versus DHI image, size, package count,
+and vulnerability count.
 
 Clean up when finished:
 
