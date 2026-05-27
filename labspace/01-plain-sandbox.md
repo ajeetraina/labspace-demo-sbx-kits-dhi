@@ -29,25 +29,20 @@ your host Docker context directly.
 
 ## Show Network Policy
 
-From the Labspace terminal, show that outbound network access is policy
-controlled. Development endpoints needed by the sandbox can work, while
-unapproved destinations are denied:
+With the Claude sandbox session still open, use the run button to send
+short shell escapes into that same sandbox. Development endpoints needed
+by the sandbox can work, while unapproved destinations are denied:
 
-```bash
-sbx exec p1-yolo bash -lc '
-  echo "Allowed development endpoint:"
-  curl -fsS --max-time 8 https://api.github.com/rate_limit >/dev/null &&
-    echo "github api: allowed"
-
-  echo
-  echo "Unapproved destination:"
-  curl -fsS --max-time 8 https://example.com -o /tmp/example.html &&
-    echo "example.com: allowed unexpectedly" ||
-    echo "example.com: blocked as expected"
-'
+```text
+! curl -fsS --max-time 8 https://api.github.com/rate_limit >/dev/null && echo "github api: allowed"
 ```
 
-The `example.com` request should fail. Show the audit trail:
+```text
+! curl -fsS --max-time 8 https://example.com
+```
+
+The `example.com` request should fail. In a second terminal tab, or
+after exiting Claude, show the audit trail:
 
 ```bash
 sbx policy log p1-yolo --limit 20
@@ -64,55 +59,37 @@ the quality bar the model chose by itself.
 
 Inspect the Dockerfile:
 
-```bash
-sbx exec p1-yolo bash -lc '
-  cd "$WORKSPACE_DIR"
+```text
+! grep -nE "^[[:space:]]*FROM[[:space:]]" Dockerfile
+```
 
-  echo "Base images:"
-  grep -nE "^[[:space:]]*FROM[[:space:]]" Dockerfile || true
+```text
+! grep -cE "^[[:space:]]*FROM[[:space:]]" Dockerfile
+```
 
-  echo
-  echo "Number of stages:"
-  grep -cE "^[[:space:]]*FROM[[:space:]]" Dockerfile
+```text
+! grep -nE "^[[:space:]]*USER[[:space:]]" Dockerfile || echo "no USER directive"
+```
 
-  echo
-  echo "Runtime user directive:"
-  grep -nE "^[[:space:]]*USER[[:space:]]" Dockerfile ||
-    echo "none; runtime defaults to the base image user"
-
-  echo
-  echo ".dockerignore:"
-  test -f .dockerignore && sed -n "1,120p" .dockerignore || echo "missing"
-'
+```text
+! test -f .dockerignore && sed -n "1,120p" .dockerignore || echo "missing .dockerignore"
 ```
 
 Inspect the image the agent built. If Claude used a different tag,
 change `IMAGE` first:
 
-```bash
-sbx exec p1-yolo bash -lc '
-  IMAGE="${IMAGE:-$(docker images --format "{{.Repository}}:{{.Tag}}" | grep -v "^<none>:" | head -1)}"
+```text
+! docker images --format "table {{.Repository}}:{{.Tag}}\t{{.Size}}\t{{.CreatedSince}}" | sed -n "1,10p"
+```
 
-  echo "Recent local images:"
-  docker images --format "table {{.Repository}}:{{.Tag}}\t{{.Size}}\t{{.CreatedSince}}" | sed -n "1,10p"
-
-  echo
-  echo "Inspecting $IMAGE:"
-  docker image inspect "$IMAGE" \
-    --format "User={{.Config.User}} Size={{.Size}} Entrypoint={{json .Config.Entrypoint}} Cmd={{json .Config.Cmd}}" \
-    2>/dev/null || echo "Set IMAGE=<tag Claude built> and rerun this block."
-'
+```text
+! docker image inspect sample-app:latest --format "User={{.Config.User}} Size={{.Size}} Cmd={{json .Config.Cmd}}"
 ```
 
 Optional lint check:
 
-```bash
-sbx exec p1-yolo bash -lc '
-  cd "$WORKSPACE_DIR"
-  command -v hadolint >/dev/null &&
-    hadolint Dockerfile ||
-    echo "hadolint is not installed in the plain sandbox"
-'
+```text
+! command -v hadolint >/dev/null && hadolint Dockerfile || echo "hadolint is not installed in the plain sandbox"
 ```
 
 Use those outputs to answer:
