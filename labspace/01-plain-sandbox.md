@@ -9,15 +9,15 @@ cd ~/.labspace/project/demo/sample-app
 ```
 
 ```bash
-sed -n '1,120p' package.json
+cat package.json
 ```
 
 ```bash
-sed -n '1,120p' src/server.ts
+cat src/server.ts
 ```
 
 ```bash
-sed -n '1,160p' src/app.ts
+cat src/app.ts
 ```
 
 Run the baseline sandbox:
