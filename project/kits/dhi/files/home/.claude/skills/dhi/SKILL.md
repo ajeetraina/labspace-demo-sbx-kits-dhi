@@ -62,8 +62,11 @@ docker image inspect app:baseline app:dhi --format '{{join .RepoTags ","}} {{.Si
 ```
 
 The preferred visual proof is the Docker Hub / Docker Scout Dashboard
-comparison after the baseline and DHI tags are pushed. Do not block the
-DHI work on local Scout authentication.
+comparison after the baseline and DHI tags are pushed. If pushing a
+comparison image for Scout, build with `--sbom=true` and
+`--provenance=mode=max`; Scout needs max-mode provenance to trace DHI
+base-image lineage and apply DHI/VEX evidence correctly. Do not block
+the DHI work on local Scout authentication.
 
 `dhictl` and `docker dhi` are preinstalled in this sandbox.
 

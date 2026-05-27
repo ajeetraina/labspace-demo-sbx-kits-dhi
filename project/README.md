@@ -148,8 +148,8 @@ https://scout.docker.com/org/olegselajev241/images/docker.io/olegselajev241/todo
 Observed Scout comparison:
 
 ```text
-baseline: node:24-trixie-slim, 104 MB, 323 packages, 0C 0H 3M 22L 3?, policy FAILED
-DHI:      dhi.io/node:24-debian13, 43 MB, 96 packages, 0C 0H 0M 8L, policy SUCCESS
+baseline: node:24-trixie-slim, 104 MB, 323 packages, 0C 0H 3M 22L 3?
+DHI:      dhi.io/node:24-debian13, 43 MB, 96 packages, 0C 0H 0M 8L
 delta:    -61 MB, -227 packages, -20 vulnerabilities, default non-root policy improved
 ```
 
@@ -428,8 +428,8 @@ https://scout.docker.com/org/olegselajev241/images/docker.io/olegselajev241/todo
 Talk through the before/after:
 
 ```text
-baseline: node:24-trixie-slim, 104 MB, 323 packages, 0C 0H 3M 22L 3?, policy FAILED
-DHI:      dhi.io/node:24-debian13, 43 MB, 96 packages, 0C 0H 0M 8L, policy SUCCESS
+baseline: node:24-trixie-slim, 104 MB, 323 packages, 0C 0H 3M 22L 3?
+DHI:      dhi.io/node:24-debian13, 43 MB, 96 packages, 0C 0H 0M 8L
 ```
 
 If you want to refresh the Hub evidence before the demo, build and push
@@ -440,14 +440,14 @@ auth and Docker Hub push auth:
 IMAGE=olegselajev241/todo-demo-application
 
 docker buildx build --push --platform linux/arm64 \
-  --sbom=true --provenance=true \
+  --sbom=true --provenance=mode=max \
   -f Dockerfile.baseline \
-  -t "$IMAGE:sbx-dhi-baseline" .
+  -t "${IMAGE}:sbx-dhi-baseline" .
 
 docker buildx build --push --platform linux/arm64 \
-  --sbom=true --provenance=true \
+  --sbom=true --provenance=mode=max \
   -f Dockerfile.dhi \
-  -t "$IMAGE:sbx-dhi-dhi" .
+  -t "${IMAGE}:sbx-dhi-dhi" .
 ```
 
 **Land the message:** the kit is the *unit of policy*. Authors of

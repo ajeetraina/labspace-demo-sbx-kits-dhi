@@ -169,8 +169,8 @@ https://scout.docker.com/org/olegselajev241/images/docker.io/olegselajev241/todo
 Observed local Scout comparison from the pushed repo:
 
 ```text
-baseline: node:24-trixie-slim, 104 MB, 323 packages, 0C 0H 3M 22L 3?, policy FAILED
-DHI:      dhi.io/node:24-debian13, 43 MB, 96 packages, 0C 0H 0M 8L, policy SUCCESS
+baseline: node:24-trixie-slim, 104 MB, 323 packages, 0C 0H 3M 22L 3?
+DHI:      dhi.io/node:24-debian13, 43 MB, 96 packages, 0C 0H 0M 8L
 delta:    -61 MB, -227 packages, -20 vulnerabilities, default non-root improved
 ```
 

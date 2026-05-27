@@ -62,14 +62,14 @@ CMD ["node", "dist/server.js"]
 DOCKERFILE
 
 echo "Building baseline Docker Official Image: $baseline_tag"
-docker build --provenance=true --sbom=true \
+docker build --provenance=mode=max --sbom=true \
   -f "$tmp_dir/Dockerfile.doi" \
   -t "$baseline_tag" \
   "$app_dir"
 
 echo
 echo "Building DHI image: $dhi_tag"
-docker build --provenance=true --sbom=true \
+docker build --provenance=mode=max --sbom=true \
   -f "$tmp_dir/Dockerfile.dhi" \
   -t "$dhi_tag" \
   "$app_dir"

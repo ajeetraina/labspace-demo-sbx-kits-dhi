@@ -119,7 +119,7 @@ change. If you need a direct comparison link for this prepared demo,
 open:
 
 ```text
-https://scout.docker.com/reports/org/olegselajev241/images/compare/host/hub.docker.com/repo/olegselajev241%2Ftodo-demo-application/tag/sbx-dhi-baseline/digest/sha256%3A126733d8537c6b0a13ce66f20ac7010f801235e96d44cc59dfce5da70debbe5b/to/host/hub.docker.com/repo/olegselajev241%2Ftodo-demo-application/tag/sbx-dhi-dhi/digest/sha256%3A39af4388477e340ccaab07a5795d868b6e7db048dc38e30fb5629a90d87c1b3e/vulnerabilities
+https://scout.docker.com/reports/org/olegselajev241/images/compare/host/hub.docker.com/repo/olegselajev241%2Ftodo-demo-application/tag/sbx-dhi-baseline/digest/sha256%3A17efa9bd7111ecaa79e16b9c7328a7d2d40d0ef088f2463972abac0742204874/to/host/hub.docker.com/repo/olegselajev241%2Ftodo-demo-application/tag/sbx-dhi-dhi/digest/sha256%3A39af4388477e340ccaab07a5795d868b6e7db048dc38e30fb5629a90d87c1b3e/vulnerabilities
 ```
 
 Talking point: do not make this section about in-sandbox Scout CLI
@@ -127,11 +127,12 @@ auth. The demo value is that the same prompt plus a different kit stack
 produces a DHI-based image, and the pushed tags give a shareable Hub /
 Scout view for size, packages, and vulnerabilities.
 
-If Scout policy cards show `No data` for some base-image checks on the
-DHI tag, do not dwell on that as the core proof. Those cards depend on
-the policy metadata Scout has for that tag. The comparison view is the
-stable demo artifact: baseline versus DHI image, size, package count,
-and vulnerability count.
+The `No outdated base images` and `No unapproved base images` cards are
+generic base-image policies. If they show `No data` for the DHI tag, do
+not present that as a DHI failure. First make sure pushed comparison
+tags were built with `--sbom=true` and `--provenance=mode=max`; then use
+the DHI-specific policy, package count, size, and vulnerability
+comparison as the demo evidence.
 
 Clean up when finished:
 
