@@ -76,7 +76,7 @@ sbx run --name p4-dhi claude \
 When Claude opens, use the run button on this block to paste the same
 prompt as before into that Claude session:
 
-```text
+```bash
 Containerize this app. Build the image and run it.
 ```
 

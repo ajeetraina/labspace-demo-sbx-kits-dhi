@@ -29,7 +29,7 @@ sbx run --name p1-yolo claude
 When Claude opens, use the run button on this block to paste the prompt
 into that Claude session:
 
-```text
+```bash
 Containerize this app. Build the image and run it.
 ```
 
@@ -43,11 +43,11 @@ With the Claude sandbox session still open, use the run button to send
 short shell escapes into that same sandbox. Development endpoints needed
 by the sandbox can work, while unapproved destinations are denied:
 
-```text
+```bash
 ! curl -fsS --max-time 8 https://api.github.com/rate_limit >/dev/null && echo "github api: allowed"
 ```
 
-```text
+```bash
 ! curl -fsS --max-time 8 https://example.com
 ```
 
@@ -81,7 +81,7 @@ the quality bar the model chose by itself.
 
 Inspect the Dockerfile:
 
-```text
+```bash
 ! grep -nE "^[[:space:]]*FROM[[:space:]]" Dockerfile
 ```
 
@@ -90,28 +90,28 @@ single-stage image; two or more lines means the agent chose a
 multi-stage build. Also call out whether the base is pinned, `latest`,
 slim, alpine, or something else.
 
-```text
+```bash
 ! grep -nE "^[[:space:]]*USER[[:space:]]" Dockerfile || echo "no USER directive"
 ```
 
-```text
+```bash
 ! test -f .dockerignore && sed -n "1,120p" .dockerignore || echo "missing .dockerignore"
 ```
 
 Inspect the image the agent built. If Claude used a different tag,
 change `IMAGE` first:
 
-```text
+```bash
 ! docker images --format "table {{.Repository}}:{{.Tag}}\t{{.Size}}\t{{.CreatedSince}}" | sed -n "1,10p"
 ```
 
-```text
+```bash
 ! docker image inspect sample-app:latest --format "User={{.Config.User}} Size={{.Size}} Cmd={{json .Config.Cmd}}"
 ```
 
 Optional lint check:
 
-```text
+```bash
 ! command -v hadolint >/dev/null && hadolint Dockerfile || echo "hadolint is not installed in the plain sandbox"
 ```
 

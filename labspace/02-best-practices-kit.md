@@ -65,7 +65,7 @@ sbx run --name p2-best-practices claude --kit ../../kits/container-best-practice
 When Claude opens, use the run button on this block to paste the same
 prompt into that Claude session:
 
-```text
+```bash
 Containerize this app. Build the image and run it.
 ```
 
@@ -85,7 +85,7 @@ Claude's own transcript:
 
 If you want one quick live check after Claude finishes, use this:
 
-```text
+```bash
 ! hadolint Dockerfile
 ```
 
