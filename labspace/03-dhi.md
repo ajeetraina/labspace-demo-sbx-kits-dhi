@@ -12,6 +12,16 @@ replace those placeholders for registry requests. If you added or
 changed those secrets after creating `p4-dhi`, remove and recreate that
 sandbox before continuing.
 
+If the best-practices sandbox is still open, press `Ctrl+C` twice: once
+to stop Claude, and once more to exit the SBX session.
+
+Remove the previous sandboxes before creating the DHI one. The same
+workspace cannot be owned by multiple named sandboxes at once:
+
+```bash
+sbx rm -f p2-best-practices p4-dhi kits-smoke
+```
+
 Inspect the kit:
 
 ```bash
