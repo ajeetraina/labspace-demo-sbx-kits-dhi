@@ -1,66 +1,25 @@
-# Restart Handoff
+# Demo Handoff
 
-This file captures the current state of the SBX kits + DHI Labspace so
-the work can be resumed after a machine restart.
+This repo contains the SBX Kits + Docker Hardened Images Labspace demo.
+The demo is driven from the rendered Labspace instructions and their
+talking points.
 
-## Repository
-
-Run these commands from this repository root:
+## Clone
 
 ```bash
-git status --short --branch
+git clone git@github.com:shelajev/labspace-demo-sbx-kits-dhi.git
+cd labspace-demo-sbx-kits-dhi
+```
+
+If the repo already exists:
+
+```bash
 git pull --ff-only
 ```
 
-Remote:
+## Install Labspace
 
-```text
-git@github.com:shelajev/labspace-demo-sbx-kits-dhi.git
-```
-
-The Labspace payload is under `project/`. The rendered lab instructions
-are under `labspace/`.
-
-## What This Labspace Is
-
-The lab demonstrates the same sample app through three increasingly
-stronger SBX workflows:
-
-1. Plain SBX sandbox: Claude containerizes the app with no extra policy.
-2. SBX sandbox with `container-best-practices`: the kit installs
-   hadolint and gives the agent Dockerfile guardrails.
-3. SBX sandbox with `container-best-practices` plus `dhi`: the kit
-   installs the Docker Hardened Images CLI, seeds Docker auth
-   placeholders, and tells the agent to move the app to DHI base images.
-
-For the final evidence view, use the already pushed baseline and DHI
-image tags in Docker Hub / Docker Scout Dashboard. The demo does not
-depend on running `docker scout` inside the sandbox.
-
-## Restart Commands
-
-After reboot, start Docker Desktop first.
-
-Then start the Labspace from this repository root:
-
-```bash
-CONTENT_PATH=$PWD docker labspace author
-```
-
-For a one-off local launch without authoring watch mode:
-
-```bash
-CONTENT_PATH=$PWD docker labspace launch ./compose.yaml -y
-```
-
-Open:
-
-```text
-Lab page: http://localhost:3030
-Terminal: http://localhost:8085
-```
-
-If the Labspace CLI plugin is missing, reinstall it:
+Install or update the Docker Labspace CLI plugin:
 
 ```bash
 gh release download v0.6.0 \
@@ -74,16 +33,78 @@ ln -sf ~/.docker/cli-plugins/docker-labspace ~/.local/bin/labspace
 docker labspace version
 ```
 
-If the Labspace base content pull returns `401 Unauthorized`, log in to
-Docker Hub on the host with a PAT, then retry:
+Start Docker Desktop before launching the lab.
+
+## Run
+
+From the repository root:
+
+```bash
+CONTENT_PATH=$PWD docker labspace author
+```
+
+Open:
+
+```text
+Lab page: http://localhost:3030
+Terminal: http://localhost:8085
+```
+
+For a non-authoring launch:
+
+```bash
+CONTENT_PATH=$PWD docker labspace launch ./compose.yaml -y
+```
+
+If the Labspace content pull returns `401 Unauthorized`, log in to Docker
+Hub on the host and rerun the launch command:
 
 ```bash
 docker login
 ```
 
-## Current Verification
+## Present
 
-Run these checks from this repository root after edits:
+Follow the Labspace sections in order:
+
+1. **Step 0: Prerequisites**
+   Set the Docker username variable and register the SBX custom secrets.
+   Use a Docker Hub PAT that can pull DHI images and push to the demo
+   namespace. If Docker Hub rejects the first push, create
+   `<docker-username>/todo-demo-application` in Hub and rerun the push
+   block.
+
+2. **Start with a Plain Sandbox**
+   Show that an agent can use a real shell and Docker daemon inside an
+   isolated SBX sandbox. Use the network-policy checks and Dockerfile
+   inspection commands as talking points. Push the baseline tag under the
+   presenter's Docker namespace if you want fresh Hub / Scout evidence.
+
+3. **Add the Best Practices Kit**
+   Show that a kit makes the sandbox repeatable and shareable. Point at
+   the YAML, installed tooling, network rules, and loaded Claude skill.
+
+4. **Add the DHI Kit**
+   Run the same prompt again with both kits. Point at `Skill(dhi)` in the
+   Claude transcript, the DHI base images, the local size reduction, and
+   then push the DHI tag under the same Docker namespace.
+
+5. **Hub / Scout Evidence**
+   Open the repository created by the presenter:
+
+   ```text
+   https://hub.docker.com/repository/docker/<docker-username>/todo-demo-application/tags
+   https://scout.docker.com/reports/org/<docker-username>/images/host/hub.docker.com/repo/<docker-username>%2Ftodo-demo-application
+   ```
+
+   Compare `sbx-dhi-baseline` with `sbx-dhi-dhi`. Focus on size,
+   package count, vulnerability count, and the DHI-specific evidence.
+   Some generic base-image policy cards may show `No data`; that is not
+   the core demo signal.
+
+## Validate
+
+Before presenting or after edits:
 
 ```bash
 sbx kit validate ./project/kits/container-best-practices
@@ -91,110 +112,9 @@ sbx kit validate ./project/kits/dhi
 git diff --check
 ```
 
-When the host can pull the Labspace base content, also run:
+The Labspace teardown script removes the named demo sandboxes. Manual
+cleanup is:
 
 ```bash
-CONTENT_PATH=$PWD docker compose config >/tmp/labspace-demo-compose-config.yaml
+sbx rm -f prewarm p1-yolo p2-best-practices p4-dhi
 ```
-
-Optional smoke test:
-
-```bash
-sbx create --name kits-smoke claude ./project/demo/sample-app \
-  --kit ./project/kits/container-best-practices \
-  --kit ./project/kits/dhi
-
-sbx exec kits-smoke bash -lc '
-  test -f ~/.docker/config.json &&
-  dhictl --version &&
-  docker dhi --version &&
-  hadolint --version &&
-  ls ~/.claude/skills/ &&
-  ls "$WORKSPACE_DIR"
-'
-```
-
-Expected installed DHI tooling:
-
-```text
-dhictl version v0.0.3
-dhi version v0.0.3
-```
-
-## DHI Secrets
-
-Step 0 in the Labspace page registers Docker Hub and `dhi.io` auth
-placeholders with `sbx secret set-custom`. Use a Docker Hub PAT as the
-registry password. Do not paste the real PAT into the sandbox.
-
-Global secrets are used for new sandboxes. If you change the secrets,
-recreate the DHI sandbox:
-
-```bash
-cd ~/.labspace/project
-sbx rm -f kits-smoke p4-dhi
-```
-
-Check real authenticated DHI access:
-
-```bash
-sbx exec kits-smoke bash -lc '
-  docker dhi catalog list --json >/tmp/dhi-catalog.json &&
-  docker pull dhi.io/node:24-debian13
-'
-```
-
-If this returns `401 Unauthorized`, the install is still fine. It means
-the PAT is missing, expired, does not have access to DHI, or the account
-uses a Docker Hub organization mirror instead of direct `dhi.io` pulls.
-Use the mirrored image reference shown by the DHI CLI or by the
-organization setup.
-
-## Demo Images
-
-These tags are available for the Hub / Scout Dashboard comparison:
-
-```text
-docker.io/olegselajev241/todo-demo-application:sbx-dhi-baseline
-docker.io/olegselajev241/todo-demo-application:sbx-dhi-dhi
-```
-
-Useful views:
-
-```text
-https://hub.docker.com/r/olegselajev241/todo-demo-application/tags?name=sbx-dhi
-https://scout.docker.com/org/olegselajev241/images/docker.io/olegselajev241/todo-demo-application
-```
-
-Observed local Scout comparison from the pushed repo:
-
-```text
-baseline: node:24-trixie-slim, 104 MB, 323 packages, 0C 0H 3M 22L 3?
-DHI:      dhi.io/node:24-debian13, 43 MB, 96 packages, 0C 0H 0M 8L
-delta:    -61 MB, -227 packages, -20 vulnerabilities, default non-root improved
-```
-
-## Cleanup
-
-Manual cleanup:
-
-```bash
-sbx rm -f prewarm kits-smoke p1-yolo p2-best-practices p4-dhi
-```
-
-The Labspace teardown script also removes those demo sandboxes:
-
-```yaml
-teardown_script: |
-  sbx rm --force prewarm kits-smoke p1-yolo p2-best-practices p4-dhi || true
-```
-
-## Notes
-
-- The Labspace uses `compose.override.yaml` to switch the workspace to
-  the host-backed Labspace terminal provider.
-- `compose.yaml` includes `sync-service`, which syncs `project/` into
-  `~/.labspace/project` for development.
-- The `dhi` kit intentionally does not store the real Docker PAT in the
-  sandbox. It writes fake Docker auth placeholders and relies on
-  host-side `sbx secret set-custom` replacements for registry requests.

@@ -124,3 +124,48 @@ Use those outputs to answer:
 - Does it lint or verify the Dockerfile?
 
 The lesson: SBX gives the agent a real shell and Docker daemon inside an isolated sandbox. The isolation is strong, but the output quality is still whatever the model decides without guidance.
+
+## Publish the Baseline Tag
+
+Use this only after the agent has finished the baseline pass. It pushes a
+deterministic baseline image from the checked-in `Dockerfile.baseline`
+under the Docker namespace from Step 0:
+
+```bash
+! bash <<'SCRIPT'
+set -euo pipefail
+
+IMAGE="docker.io/$$dockerUsername$$/todo-demo-application"
+if printf '%s' "$IMAGE" | grep -q 'dockerUsername'; then
+  echo "Set the Docker username in Step 0 first." >&2
+  exit 1
+fi
+
+case "$(uname -m)" in
+  x86_64) PLATFORM=linux/amd64 ;;
+  aarch64|arm64) PLATFORM=linux/arm64 ;;
+  *) echo "unsupported architecture: $(uname -m)" >&2; exit 1 ;;
+esac
+
+mkdir -p "$HOME/.docker"
+cat > "$HOME/.docker/config.json" <<'JSON'
+{
+  "auths": {
+    "https://index.docker.io/v1/": {
+      "auth": "c2J4X2RvY2tlcl9odWJfdXNlcjpzYnhfZG9ja2VyX2h1Yl9wYXQK"
+    }
+  }
+}
+JSON
+
+docker buildx build --push --platform "$PLATFORM" \
+  --sbom=true --provenance=mode=max \
+  -f Dockerfile.baseline \
+  -t "${IMAGE}:sbx-dhi-baseline" .
+SCRIPT
+```
+
+Talking point: this still does not put the real PAT in the sandbox. The
+Docker config contains the fake auth placeholder from Step 0; SBX
+replaces it at the proxy boundary when the registry request leaves the
+sandbox.

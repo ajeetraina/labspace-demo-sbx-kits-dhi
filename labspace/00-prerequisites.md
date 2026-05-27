@@ -28,7 +28,9 @@ Prepare Docker credentials for the DHI step:
    **Account settings** -> **Personal access tokens** -> **Generate token**.
 2. Use a Docker account or organization that can pull Docker Hardened
    Images.
-3. Copy the token once. Docker will not show it again.
+3. Give the token permission to push to your Docker Hub namespace. The
+   lab publishes two comparison tags there.
+4. Copy the token once. Docker will not show it again.
 
 Use the PAT as the Docker registry password. Do not use the Docker
 account password for this lab.
@@ -37,7 +39,15 @@ Set the Docker username for the rest of this lab:
 
 ::variableDefinition[dockerUsername]{prompt="Docker username"}
 
-:variableSetButton[Use olegselajev241]{variables="dockerUsername=olegselajev241"}
+The lab uses this image repository for shareable Hub / Scout evidence:
+
+```text
+docker.io/$$dockerUsername$$/todo-demo-application
+```
+
+If Docker Hub rejects the first push with `denied`, create that
+repository in Docker Hub under the same namespace and rerun the push
+block.
 
 Register the Docker Hub and `dhi.io` auth placeholders. When prompted,
 paste the PAT and press Enter. Input is hidden.

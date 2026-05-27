@@ -91,36 +91,64 @@ dhi.io/node:24-debian13-dev
 dhi.io/node:24-debian13
 ```
 
-The local sandbox proves the agent can use the DHI policy. For the
-shareable proof, switch to Docker Hub and Docker Scout. Open the Hub
-tags page and point at the baseline and DHI tags:
+## Publish the DHI Tag
+
+Use this after Claude has shown that the DHI kit is active. It pushes a
+deterministic DHI image from the checked-in `Dockerfile.dhi` under the
+same Docker namespace as the baseline tag:
+
+```bash
+! bash <<'SCRIPT'
+set -euo pipefail
+
+IMAGE="docker.io/$$dockerUsername$$/todo-demo-application"
+if printf '%s' "$IMAGE" | grep -q 'dockerUsername'; then
+  echo "Set the Docker username in Step 0 first." >&2
+  exit 1
+fi
+
+case "$(uname -m)" in
+  x86_64) PLATFORM=linux/amd64 ;;
+  aarch64|arm64) PLATFORM=linux/arm64 ;;
+  *) echo "unsupported architecture: $(uname -m)" >&2; exit 1 ;;
+esac
+
+docker buildx build --push --platform "$PLATFORM" \
+  --sbom=true --provenance=mode=max \
+  -f Dockerfile.dhi \
+  -t "${IMAGE}:sbx-dhi-dhi" .
+SCRIPT
+```
+
+Talking point: this sandbox has the DHI kit, so Docker Hub and `dhi.io`
+auth are both placeholder-managed. The image push creates shareable Hub /
+Scout evidence without exposing the real PAT inside the VM.
+
+The local sandbox proves the agent can use the DHI policy. The pushed
+tags make the result shareable. Open the Hub tags page and point at the
+baseline and DHI tags:
 
 ```text
-https://hub.docker.com/repository/docker/olegselajev241/todo-demo-application/tags
+https://hub.docker.com/repository/docker/$$dockerUsername$$/todo-demo-application/tags
 ```
 
 Use these two tags for comparison:
 
 ```text
-docker.io/olegselajev241/todo-demo-application:sbx-dhi-baseline
-docker.io/olegselajev241/todo-demo-application:sbx-dhi-dhi
+docker.io/$$dockerUsername$$/todo-demo-application:sbx-dhi-baseline
+docker.io/$$dockerUsername$$/todo-demo-application:sbx-dhi-dhi
 ```
 
 On Hub, show the tag size difference. Then open the Docker Scout image
 view:
 
 ```text
-https://scout.docker.com/reports/org/olegselajev241/images/host/hub.docker.com/repo/olegselajev241%2Ftodo-demo-application
+https://scout.docker.com/reports/org/$$dockerUsername$$/images/host/hub.docker.com/repo/$$dockerUsername$$%2Ftodo-demo-application
 ```
 
 In Scout, select `sbx-dhi-baseline` and `sbx-dhi-dhi`, then click
-Compare. Use the comparison to show the vulnerability and package-count
-change. If you need a direct comparison link for this prepared demo,
-open:
-
-```text
-https://scout.docker.com/reports/org/olegselajev241/images/compare/host/hub.docker.com/repo/olegselajev241%2Ftodo-demo-application/tag/sbx-dhi-baseline/digest/sha256%3A17efa9bd7111ecaa79e16b9c7328a7d2d40d0ef088f2463972abac0742204874/to/host/hub.docker.com/repo/olegselajev241%2Ftodo-demo-application/tag/sbx-dhi-dhi/digest/sha256%3A39af4388477e340ccaab07a5795d868b6e7db048dc38e30fb5629a90d87c1b3e/vulnerabilities
-```
+Compare. Use the comparison to show the size, package-count, and
+vulnerability change.
 
 Talking point: do not make this section about in-sandbox Scout CLI
 auth. The demo value is that the same prompt plus a different kit stack
