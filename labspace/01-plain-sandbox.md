@@ -51,11 +51,23 @@ by the sandbox can work, while unapproved destinations are denied:
 ! curl -fsS --max-time 8 https://example.com
 ```
 
-The `example.com` request should fail. In a second terminal tab, or
-after exiting Claude, show the audit trail:
+The `example.com` request should fail. Open another terminal tab with
+the `+` button and use it to show the SBX control surface:
+
+```bash
+sbx
+```
+
+Then show the network audit trail for this sandbox:
 
 ```bash
 sbx policy log p1-yolo --limit 20
+```
+
+You can also show the active sandbox list from that tab:
+
+```bash
+sbx ls
 ```
 
 Talking point: SBX is not just "a container". The sandbox has an
