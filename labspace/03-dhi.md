@@ -29,7 +29,8 @@ sbx run --name p4-dhi claude \
   --kit ../../kits/dhi
 ```
 
-Ask Claude:
+When Claude opens, use the run button on this block to paste the DHI
+prompt into that Claude session:
 
 ```text
 Harden the image with Docker Hardened Images and report the evidence I can show in Docker Hub.

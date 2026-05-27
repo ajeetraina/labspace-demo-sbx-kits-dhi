@@ -26,7 +26,8 @@ Run the baseline sandbox:
 sbx run --name p1-yolo claude
 ```
 
-When Claude opens, ask:
+When Claude opens, use the run button on this block to paste the prompt
+into that Claude session:
 
 ```text
 Containerize this app. Build the image and run it.

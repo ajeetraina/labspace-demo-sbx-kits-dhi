@@ -18,7 +18,8 @@ cd ~/.labspace/project/demo/sample-app
 sbx run --name p2-best-practices claude --kit ../../kits/container-best-practices
 ```
 
-Ask the same thing:
+When Claude opens, use the run button on this block to paste the same
+prompt into that Claude session:
 
 ```text
 Containerize this app. Build the image and run it.
