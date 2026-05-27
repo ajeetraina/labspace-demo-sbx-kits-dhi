@@ -6,8 +6,17 @@ Open the sample app:
 
 ```bash
 cd ~/.labspace/project/demo/sample-app
+```
+
+```bash
 sed -n '1,120p' package.json
+```
+
+```bash
 sed -n '1,120p' src/server.ts
+```
+
+```bash
 sed -n '1,160p' src/app.ts
 ```
 
