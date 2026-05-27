@@ -5,6 +5,13 @@ Now run the same task with a generic container best-practices kit attached.
 If the plain sandbox is still open, press `Ctrl+C` twice: once to stop
 Claude, and once more to exit the SBX session.
 
+Remove the first sandbox before creating the kit-guided one. The same
+workspace cannot be owned by two named sandboxes at once:
+
+```bash
+sbx rm -f p1-yolo p2-best-practices
+```
+
 Inspect the kit:
 
 ```bash
