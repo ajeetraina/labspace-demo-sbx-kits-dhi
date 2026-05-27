@@ -83,8 +83,19 @@ Compare the result with the plain sandbox. The kit should push the agent toward:
 
 ## Show the Kit in Action
 
-Use the run button in the Claude session after it finishes. These are
-the same checks as the plain sandbox, so the difference is easy to see.
+You may not need extra commands here. The strongest proof is often in
+Claude's own transcript:
+
+- It loads `Skill(container-best-practices)`.
+- It says the existing Dockerfile needs a better base image, non-root
+  user, and healthcheck.
+- It rewrites `FROM node:20-alpine` to a pinned
+  `node:24-trixie-slim` build/runtime pair.
+- It adds a dedicated user and `USER appuser`.
+- It improves `.dockerignore`.
+- It runs `hadolint Dockerfile` and gets no output.
+
+If you want a quick live check after Claude finishes, use these:
 
 ```text
 ! grep -nE "^[[:space:]]*FROM[[:space:]]" Dockerfile
@@ -115,18 +126,5 @@ the image.
 Talking point: this is the clearest proof the kit changed the sandbox.
 The plain sandbox did not have `hadolint`; this one does, and the skill
 tells the agent to run it before completion.
-
-```text
-! docker images --format "table {{.Repository}}:{{.Tag}}\t{{.Size}}\t{{.CreatedSince}}" | sed -n "1,10p"
-```
-
-```text
-! docker image inspect sample-app:latest --format "User={{.Config.User}} Size={{.Size}} Cmd={{json .Config.Cmd}}"
-```
-
-Talking point: compare size, configured user, and command with the
-plain sandbox. The win is not that the agent can build an image; it is
-that the default quality bar moved without changing the natural-language
-task.
 
 The lesson: a kit is reusable, versioned guidance. It gives every agent the same baseline without rewriting prompts by hand.
