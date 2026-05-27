@@ -30,7 +30,13 @@ docker labspace version
 Run the Labspace from this repository root:
 
 ```bash
-SHELL=$PWD/bin/labspace-shell CONTENT_PATH=$PWD docker labspace author
+CONTENT_PATH=$PWD docker labspace author
+```
+
+For a one-off local launch without authoring watch mode:
+
+```bash
+CONTENT_PATH=$PWD docker labspace launch ./compose.yaml -y
 ```
 
 Open:
