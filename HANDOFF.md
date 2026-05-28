@@ -82,9 +82,10 @@ Follow the Labspace sections in order:
    if you want fresh Hub / Scout evidence.
 
 3. **Add the Best Practices Kit**
-   Show that a kit packages sandbox capabilities in a `spec.yaml`.
-   Point at installed tooling, files, network rules, credentials, and
-   the loaded Claude skill.
+   Show that kits make sandboxes repeatable and shareable. One
+   `spec.yaml` gives the agent the tools, credentials, network rules,
+   files, startup commands, and guidance it needs to do real work the
+   same way every time.
 
 4. **Add the DHI Kit**
    Run the same prompt again with both kits. Point at `Skill(dhi)` in the
