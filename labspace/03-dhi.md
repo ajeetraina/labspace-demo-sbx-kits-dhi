@@ -169,8 +169,13 @@ vulnerability comparison as the demo evidence.
 Clean up when finished:
 
 ```bash
-sbx rm -f p1-yolo p2-best-practices p4-dhi
+sbx rm -f p1-yolo p2-best-practices p2-vscode p4-dhi
+cd ~/.labspace/project
+./scripts/reset-demo.sh
 ```
 
-The Labspace teardown script also removes these demo sandboxes when the
-lab is stopped.
+The reset script removes generated files such as the agent-created
+`Dockerfile` by restoring `demo/sample-app` to its initial nested Git
+commit. The checked-in `Dockerfile.baseline` and `Dockerfile.dhi` stay
+available for the deterministic Hub / Scout evidence pushes. The
+Labspace teardown script also runs this cleanup when the lab is stopped.

@@ -28,30 +28,7 @@ sbx rm -f prewarm >/dev/null
 
 echo
 echo "Preparing sample app git repo..."
-
-git_root=
-if git -C "$sample_dir" rev-parse --show-toplevel >/dev/null 2>&1; then
-  git_root=$(git -C "$sample_dir" rev-parse --show-toplevel)
-fi
-
-if [ "$git_root" != "$sample_root" ]; then
-  git -C "$sample_dir" init -q -b main
-fi
-
-if ! git -C "$sample_dir" rev-parse --verify HEAD >/dev/null 2>&1; then
-  git -C "$sample_dir" add .
-  git -C "$sample_dir" \
-    -c user.email=demo@example.com \
-    -c user.name=demo \
-    commit -q -m "init: leaddev sample app"
-fi
-
-if ! git -C "$sample_dir" diff --quiet ||
-  ! git -C "$sample_dir" diff --cached --quiet; then
-  echo "ERROR: demo/sample-app has uncommitted changes." >&2
-  echo "Commit, stash, or reset them before running the worktree demo." >&2
-  exit 1
-fi
+"$repo_root/scripts/reset-demo.sh"
 
 echo "Sample app repo is ready for sbx --branch worktrees."
 echo

@@ -18,4 +18,5 @@ sections:
     contentPath: 03-dhi.md
 
 teardown_script: |
-  sbx rm --force prewarm p1-yolo p2-best-practices p4-dhi || true
+  sbx rm --force prewarm p1-yolo p2-best-practices p2-vscode p4-dhi || true
+  cd ~/.labspace/project && ./scripts/reset-demo.sh || true

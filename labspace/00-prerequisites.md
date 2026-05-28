@@ -116,6 +116,15 @@ sbx kit validate ./kits/container-best-practices
 sbx kit validate ./kits/dhi
 ```
 
+Reset the sample app before each demo pass. This creates the app's
+nested Git repo if needed, removes old demo sandboxes, and restores the
+sample app to the initial state so the agent can create `Dockerfile`
+again:
+
+```bash
+./scripts/reset-demo.sh
+```
+
 Optional: pre-pull the Claude sandbox template so the first demo command
 starts faster:
 

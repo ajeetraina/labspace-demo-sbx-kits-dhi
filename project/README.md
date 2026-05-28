@@ -66,5 +66,6 @@ Optional helper scripts:
 ```sh
 ./scripts/dhi-auth.sh <docker-username>
 ./scripts/dhi-compare.sh
+./scripts/reset-demo.sh
 ./scripts/smoke.sh
 ```
