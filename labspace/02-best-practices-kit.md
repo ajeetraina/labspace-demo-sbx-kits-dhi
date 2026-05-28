@@ -97,3 +97,56 @@ stored in Git, packaged as an OCI artifact, or owned by a platform team.
 The lesson: a kit is reusable, versioned guidance. It gives every agent
 the same baseline without rebuilding the agent image or rewriting prompts
 by hand.
+
+## Optional: Show VS Code in the Sandbox
+
+If you want a more visual kit moment, stack the contributed
+`code-server` kit with the best-practices kit. This starts web VS Code
+inside the sandbox, opened on the same workspace Claude is using.
+
+Use this as an optional branch of the demo, not the main path. The first
+run downloads code-server and the Claude Code VS Code extension, so
+pre-warm it before a live audience if you want to show it.
+
+First stop the previous Claude session with `Ctrl+C` twice, then remove
+the sandbox name if it already exists:
+
+```bash
+sbx rm -f p2-vscode
+```
+
+Create the sandbox with both kits:
+
+```bash
+cd ~/.labspace/project/demo/sample-app
+```
+
+```bash
+sbx run --name p2-vscode claude \
+  --kit ../../kits/container-best-practices \
+  --kit "git+https://github.com/docker/sbx-kits-contrib.git#dir=code-server"
+```
+
+In another terminal tab, publish the editor port:
+
+```bash
+sbx ports p2-vscode --publish 18081:8080/tcp
+```
+
+Open the browser. Use the IPv4 loopback address explicitly:
+
+```bash
+open http://127.0.0.1:18081/
+```
+
+If the page does not load, check the sandbox-side service log:
+
+```bash
+sbx exec p2-vscode -- cat /tmp/code-server.log
+```
+
+Talking point: this is still the same sandbox boundary. VS Code runs
+inside the sandbox and is exposed only through an explicit localhost
+port publish. The kit added a background service, startup command, and
+editor configuration without rebuilding the underlying Claude sandbox
+template.
