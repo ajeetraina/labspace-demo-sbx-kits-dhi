@@ -1,16 +1,17 @@
 # Add the DHI Kit
 
-The final step adds organization-specific base image guidance. The
-`dhi` kit tells the agent to use Docker Hardened Images for both build
-and runtime stages, then collect image evidence that can be shown in
-Docker Hub / Docker Scout Dashboard after push.
+The final step adds organization-specific base image guidance. Docker
+Hardened Images provide minimal, secure, production-ready images
+maintained by Docker. The `dhi` kit tells the agent to use DHI for both
+build and runtime stages, then collect image evidence that can be shown
+in Docker Hub / Docker Scout Dashboard after push.
 
 This step expects the Docker credentials from Step 0. The `dhi` kit
 writes Docker auth placeholders into `~/.docker/config.json` for Docker
-Hub and `dhi.io`. Step 0 registers host-side SBX custom secrets that
-replace those placeholders for registry requests. If you added or
-changed those secrets after creating `p4-dhi`, remove and recreate that
-sandbox before continuing.
+Hub and `dhi.io`. Step 0 registers host-side SBX custom secrets, and the
+proxy rewrites outbound registry auth so the real credential does not
+enter the sandbox VM. If you added or changed those secrets after
+creating `p4-dhi`, remove and recreate that sandbox before continuing.
 
 If the best-practices sandbox is still open, press `Ctrl+C` twice: once
 to stop Claude, and once more to exit the SBX session.
@@ -30,7 +31,8 @@ cd ~/.labspace/project
 
 Talking point: this kit is a second mixin layered onto the same agent.
 The best-practices kit handles generic container quality; the DHI kit
-adds organization-specific base image policy and registry access.
+adds organization-specific base image policy, DHI tooling, network
+rules, and registry access.
 
 ```bash
 sbx kit inspect ./kits/dhi
@@ -47,7 +49,7 @@ cat ./kits/dhi/spec.yaml
 Point attention to the DHI CLI install, `network.allowedDomains`, and
 `configure-dhi-auth`. The important demo message is that the sandbox
 gets DHI tooling and placeholder auth config at startup, while the real
-Docker credential stays host-managed.
+Docker credential stays host-managed and is applied by the proxy.
 
 ```bash
 cat ./kits/dhi/files/home/.claude/skills/dhi/SKILL.md
@@ -56,7 +58,8 @@ cat ./kits/dhi/files/home/.claude/skills/dhi/SKILL.md
 Point attention to the skill rules: use DHI for every build/runtime base
 image, use `dhi.io/node:24-debian13-dev` and
 `dhi.io/node:24-debian13` for this Node demo, and collect evidence for
-Hub / Scout Dashboard review after push.
+Hub / Scout Dashboard review after push. DHI is the base-image policy;
+the kit makes that policy executable for the agent.
 
 Talking point: this is intentionally the same user task as before. The
 difference is the kit stack. The DHI skill says that, when this kit is
@@ -147,8 +150,8 @@ https://scout.docker.com/reports/org/$$dockerUsername$$/images/host/hub.docker.c
 ```
 
 In Scout, select `sbx-dhi-baseline` and `sbx-dhi-dhi`, then click
-Compare. Use the comparison to show the size, package-count, and
-vulnerability change.
+Compare. Use the comparison to show how a minimal DHI runtime changes
+image size, package count, and vulnerability findings.
 
 Talking point: do not make this section about in-sandbox Scout CLI
 auth. The demo value is that the same prompt plus a different kit stack
@@ -157,10 +160,11 @@ Scout view for size, packages, and vulnerabilities.
 
 The `No outdated base images` and `No unapproved base images` cards are
 generic base-image policies. If they show `No data` for the DHI tag, do
-not present that as a DHI failure. First make sure pushed comparison
-tags were built with `--sbom=true` and `--provenance=mode=max`; then use
-the DHI-specific policy, package count, size, and vulnerability
-comparison as the demo evidence.
+not present that as a DHI failure. For DHI child images, the important
+build flags are `--sbom=true` and `--provenance=mode=max`; Scout uses
+max-mode provenance to trace DHI base-image lineage and apply DHI VEX
+statements. Then use the DHI-specific evidence, package count, size, and
+vulnerability comparison as the demo evidence.
 
 Clean up when finished:
 

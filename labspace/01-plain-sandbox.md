@@ -1,6 +1,7 @@
 # Start with a Plain Sandbox
 
-First, let the agent containerize a small Node service in an isolated sandbox with no kit attached.
+First, let the agent containerize a small Node service in an isolated
+microVM sandbox with no kit attached.
 
 Open the sample app:
 
@@ -33,9 +34,9 @@ into that Claude session:
 Containerize this app. Build the image and run it.
 ```
 
-The sandbox is isolated, but it still has the real tools it needs to do
-the job. The agent can build, run, and test containers without touching
-your host Docker context directly.
+The sandbox gives the agent real tools, but inside its own Docker daemon,
+filesystem, and network. The agent can build, run, and test containers
+without touching your host system.
 
 ## Show Network Policy
 
@@ -70,9 +71,10 @@ You can also show the active sandbox list from that tab:
 sbx ls
 ```
 
-Talking point: SBX is not just "a container". The sandbox has an
-auditable network policy boundary. We will use secrets later in the DHI
-step; this first section is only about isolation and network control.
+Talking point: Docker Sandboxes are isolated microVM sandboxes, not just
+containers. Each sandbox has a network policy boundary you can inspect
+and audit. We will use credentials later in the DHI step; this first
+section is only about isolation and network control.
 
 ## Talking Points
 
@@ -123,7 +125,10 @@ Use those outputs to answer:
 - Does it create `.dockerignore`?
 - Does it lint or verify the Dockerfile?
 
-The lesson: SBX gives the agent a real shell and Docker daemon inside an isolated sandbox. The isolation is strong, but the output quality is still whatever the model decides without guidance.
+The lesson: Docker Sandboxes give the agent a real shell and its own
+Docker daemon inside an isolated microVM. The safety boundary is strong,
+but the output quality is still whatever the model decides without
+guidance.
 
 ## Publish the Baseline Tag
 
@@ -165,7 +170,7 @@ docker buildx build --push --platform "$PLATFORM" \
 SCRIPT
 ```
 
-Talking point: this still does not put the real PAT in the sandbox. The
-Docker config contains the fake auth placeholder from Step 0; SBX
-replaces it at the proxy boundary when the registry request leaves the
-sandbox.
+Talking point: this still does not put the real PAT in the sandbox VM.
+The Docker config contains the fake auth placeholder from Step 0; SBX
+replaces it through the host-side proxy when the registry request leaves
+the sandbox.

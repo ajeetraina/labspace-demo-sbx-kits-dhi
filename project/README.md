@@ -47,10 +47,10 @@ the size, package-count, and vulnerability comparison.
 
 ## Secrets
 
-Do not paste Docker credentials into a sandbox. Step 0 of the Labspace
-registers SBX custom secrets on the host. The kits write placeholder
-Docker auth config inside the sandbox, and SBX replaces those placeholders
-at the proxy boundary for registry requests.
+Do not paste Docker credentials into a sandbox VM. Step 0 of the
+Labspace registers SBX custom secrets on the host. The kits write
+placeholder Docker auth config inside the sandbox, and SBX replaces those
+placeholders through the host-side proxy for registry requests.
 
 ## Validate
 

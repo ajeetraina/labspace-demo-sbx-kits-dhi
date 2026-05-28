@@ -1,7 +1,8 @@
 # Step 0: Prerequisites
 
-This Labspace uses a host-backed terminal so `sbx` can create real
-sandboxes from your machine.
+This Labspace uses a host-backed terminal so `sbx` can create Docker
+Sandboxes from your machine. A Docker Sandbox runs the agent in an
+isolated microVM with its own Docker daemon, filesystem, and network.
 
 Confirm Docker and SBX are available:
 
@@ -52,8 +53,8 @@ block.
 Register the Docker Hub and `dhi.io` auth placeholders. When prompted,
 paste the PAT and press Enter. Input is hidden.
 
-This does not put the PAT in the sandbox. The `dhi` kit writes a Docker
-config with fake auth placeholders; these host-side SBX custom secrets
+This does not put the PAT in the sandbox VM. The `dhi` kit writes a
+Docker config with fake auth placeholders; host-side SBX custom secrets
 replace those placeholders only when outbound registry requests pass
 through the SBX proxy.
 
@@ -104,7 +105,8 @@ sbx rm -f p4-dhi
 ```
 
 Do not paste the Docker PAT into the sandbox. The sandbox should only
-receive proxy-managed placeholders; the real token stays on the host.
+receive proxy-managed placeholders; the real token stays on the host and
+the proxy rewrites the outbound registry auth request.
 
 Validate the two kits packaged with the lab:
 

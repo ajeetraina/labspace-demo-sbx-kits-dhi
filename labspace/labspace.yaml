@@ -5,7 +5,7 @@ metadata:
 
 title: SBX Kits and Docker Hardened Images
 description: |
-  Compare plain SBX agent containerization with kit-guided best practices and Docker Hardened Images.
+  Compare AI coding agents in isolated Docker Sandboxes with kit-guided best practices and Docker Hardened Images.
 
 sections:
   - title: "Step 0: Prerequisites"

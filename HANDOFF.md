@@ -75,19 +75,22 @@ Follow the Labspace sections in order:
    block.
 
 2. **Start with a Plain Sandbox**
-   Show that an agent can use a real shell and Docker daemon inside an
-   isolated SBX sandbox. Use the network-policy checks and Dockerfile
-   inspection commands as talking points. Push the baseline tag under the
-   presenter's Docker namespace if you want fresh Hub / Scout evidence.
+   Show that an agent can use a real shell and its own Docker daemon,
+   filesystem, and network inside an isolated microVM sandbox. Use the
+   network-policy checks and Dockerfile inspection commands as talking
+   points. Push the baseline tag under the presenter's Docker namespace
+   if you want fresh Hub / Scout evidence.
 
 3. **Add the Best Practices Kit**
-   Show that a kit makes the sandbox repeatable and shareable. Point at
-   the YAML, installed tooling, network rules, and loaded Claude skill.
+   Show that a kit packages sandbox capabilities in a `spec.yaml`.
+   Point at installed tooling, files, network rules, credentials, and
+   the loaded Claude skill.
 
 4. **Add the DHI Kit**
    Run the same prompt again with both kits. Point at `Skill(dhi)` in the
    Claude transcript, the DHI base images, the local size reduction, and
-   then push the DHI tag under the same Docker namespace.
+   then push the DHI tag under the same Docker namespace. Describe DHI as
+   minimal, secure, production-ready images maintained by Docker.
 
 5. **Hub / Scout Evidence**
    Open the repository created by the presenter:
