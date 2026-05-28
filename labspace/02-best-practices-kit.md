@@ -150,3 +150,29 @@ inside the sandbox and is exposed only through an explicit localhost
 port publish. The kit added a background service, startup command, and
 editor configuration without rebuilding the underlying Claude sandbox
 template.
+
+## Where the Kit Ecosystem Goes
+
+Use this if people ask whether kits are only a local demo artifact.
+They are not. The docs show kits loading from local directories, Git
+repositories, and OCI registries, and the Docker-maintained contrib repo
+is the place to explore and contribute reusable kits:
+
+```text
+https://docs.docker.com/ai/sandboxes/customize/kits/
+https://github.com/docker/sbx-kits-contrib
+```
+
+Talking point: this is the shareability story. A team can keep its kit
+in Git, pin it by branch, tag, or commit, and use it the same way across
+agents. The `code-server` kit we just used came from that ecosystem:
+
+```bash
+sbx run claude --kit "git+https://github.com/docker/sbx-kits-contrib.git#dir=code-server"
+```
+
+What to say: individual developers save their setup once; teams share a
+known-good setup; platform teams publish the approved tools, network
+rules, startup services, and credential patterns. Vendors can package
+their own agent or integration as a kit instead of writing long install
+instructions.

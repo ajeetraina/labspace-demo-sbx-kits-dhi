@@ -179,3 +179,25 @@ The reset script removes generated files such as the agent-created
 commit. The checked-in `Dockerfile.baseline` and `Dockerfile.dhi` stay
 available for the deterministic Hub / Scout evidence pushes. The
 Labspace teardown script also runs this cleanup when the lab is stopped.
+
+## Where This Leads: AI Governance
+
+Use this as the closing turn if the audience asks, "What happens when a
+team actually adopts agents?"
+
+```text
+https://www.docker.com/products/ai-governance/
+```
+
+Talking point: Docker Sandboxes give the infrastructure isolation: the
+agent gets a real shell, Docker daemon, filesystem, and network, but
+inside a disposable sandbox. Kits make that setup repeatable and
+shareable. The next layer is organization governance: centralized
+policies for what agents can reach, which filesystem mounts they get,
+which MCP servers and tools are approved, and what audit trail exists
+for security teams.
+
+The handoff line: "Today we showed the developer workflow. The same
+boundary needs to become an organization control plane: access rules,
+monitoring, audit, and MCP governance. That is the direction Docker is
+building toward with Docker AI Governance."
