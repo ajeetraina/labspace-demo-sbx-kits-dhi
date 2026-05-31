@@ -100,22 +100,33 @@ slim, alpine, or something else.
 ! test -f .dockerignore && sed -n "1,120p" .dockerignore || echo "missing .dockerignore"
 ```
 
-Inspect the image the agent built. If Claude used a different tag,
-change `IMAGE` first:
+Inspect the image the agent built. The agent picks its own tag (often
+derived from the `package.json` name), so the next block auto-detects the
+most recently built image instead of assuming a fixed name:
 
 ```bash
 ! docker images --format "table {{.Repository}}:{{.Tag}}\t{{.Size}}\t{{.CreatedSince}}" | sed -n "1,10p"
 ```
 
 ```bash
-! docker image inspect sample-app:latest --format "User={{.Config.User}} Size={{.Size}} Cmd={{json .Config.Cmd}}"
+! IMAGE=$(docker images --filter "dangling=false" --format "{{.Repository}}:{{.Tag}}" | grep -v '<none>' | grep -v 'todo-demo-application' | head -1); echo "Inspecting ${IMAGE:-<none>}"; docker image inspect "$IMAGE" --format "User={{.Config.User}} Size={{.Size}} Cmd={{json .Config.Cmd}}"
 ```
 
-Optional lint check:
+Now try a Dockerfile linter:
 
 ```bash
-! command -v hadolint >/dev/null && hadolint Dockerfile || echo "hadolint is not installed in the plain sandbox"
+! command -v hadolint >/dev/null && hadolint Dockerfile || echo "hadolint is not installed in this sandbox"
 ```
+
+Talking point: a default sandbox template ships a base environment, not
+your team's custom tooling. A linter like `hadolint` simply is not there.
+The agent could go install it on its own, but then you are letting an
+agent pull arbitrary, unpinned tools off the internet on every run, which
+is neither reproducible nor something you want to trust by default. This
+is exactly the gap kits close: instead of ad-hoc installs, the
+best-practices kit in the next step provisions a curated, version-pinned
+toolset (`hadolint` and more) into the sandbox, so the same check runs
+the same way every time.
 
 Use those outputs to answer:
 
