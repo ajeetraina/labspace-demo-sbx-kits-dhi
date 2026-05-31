@@ -35,6 +35,31 @@ docker labspace version
 
 Start Docker Desktop before launching the lab.
 
+### Build the CLI from source (active-tab terminal fix)
+
+The released plugin sends run-command blocks to the first terminal tab
+instead of the focused one. The fix lives on branch
+`fix/run-command-active-tab` (PR
+<https://github.com/docker/docker-labspace-cli/pull/25>) and is not in a
+tagged release yet. To run it before the release lands, build and install
+the plugin from source:
+
+```bash
+git clone git@github.com:docker/docker-labspace-cli.git
+cd docker-labspace-cli
+git checkout fix/run-command-active-tab   # drop once merged to main
+make install
+docker labspace version
+```
+
+`make install` builds the binary in Docker, installs it to
+`~/.docker/cli-plugins/docker-labspace`, and ad-hoc signs it on macOS.
+Note that the terminal UI is served by the workspace image
+(`dockersamples/labspace-content-dev`), so this source build only changes
+behavior once that image is rebuilt from the merged change; until then,
+build your own workspace image from this branch if you need the fix live
+in the lab.
+
 ## Run
 
 From the repository root:
