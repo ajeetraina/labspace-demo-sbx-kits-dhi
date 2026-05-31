@@ -16,11 +16,13 @@ creating `p4-dhi`, remove and recreate that sandbox before continuing.
 If the best-practices sandbox is still open, press `Ctrl+C` twice: once
 to stop Claude, and once more to exit the SBX session.
 
-Remove the previous sandboxes before creating the DHI one. The same
-workspace cannot be owned by multiple named sandboxes at once:
+Remove whatever sandbox currently holds this workspace before creating
+the DHI one. A sandbox is keyed to its directory and agent, not its
+`--name`, so the directory can only own one at a time (this clears every
+demo sandbox name, so it works regardless of which step you ran last):
 
 ```bash
-sbx rm -f p2-best-practices p4-dhi
+sbx rm -f p1-yolo p2-best-practices p2-vscode p4-dhi || true
 ```
 
 Inspect the kit:

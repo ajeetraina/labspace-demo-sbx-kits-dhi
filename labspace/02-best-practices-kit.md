@@ -5,11 +5,14 @@ Now run the same task with a generic container best-practices kit attached.
 If the plain sandbox is still open, press `Ctrl+C` twice: once to stop
 Claude, and once more to exit the SBX session.
 
-Remove the first sandbox before creating the kit-guided one. The same
-workspace cannot be owned by two named sandboxes at once:
+A sandbox is keyed to its workspace directory and agent, not to its
+`--name`, so this directory can only own one sandbox at a time. Remove
+whatever sandbox currently holds this workspace before creating the
+kit-guided one (this clears every demo sandbox name, so it works no
+matter which step you ran last):
 
 ```bash
-sbx rm -f p1-yolo p2-best-practices
+sbx rm -f p1-yolo p2-best-practices p2-vscode p4-dhi || true
 ```
 
 Inspect the kit:
@@ -108,11 +111,13 @@ Use this as an optional branch of the demo, not the main path. The first
 run downloads code-server and the Claude Code VS Code extension, so
 pre-warm it before a live audience if you want to show it.
 
-First stop the previous Claude session with `Ctrl+C` twice, then remove
-the sandbox name if it already exists:
+First stop the previous Claude session with `Ctrl+C` twice. The sandbox
+currently holding this workspace is `p2-best-practices` — the `--name`
+does not matter, the directory can only own one sandbox at a time — so
+clear every demo sandbox name before creating the VS Code one:
 
 ```bash
-sbx rm -f p2-vscode
+sbx rm -f p1-yolo p2-best-practices p2-vscode p4-dhi || true
 ```
 
 Create the sandbox with both kits:

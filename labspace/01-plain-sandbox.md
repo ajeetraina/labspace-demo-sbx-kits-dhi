@@ -21,6 +21,16 @@ cat src/server.ts
 cat src/app.ts
 ```
 
+Each Docker Sandbox is keyed to its workspace directory and agent, not to
+the `--name` you give it, so this directory can only own one sandbox at a
+time. Before starting any sandbox here, clear out any sandbox left over
+from a previous run or step (this removes every demo sandbox name, so it
+works no matter what ran last):
+
+```bash
+sbx rm -f p1-yolo p2-best-practices p2-vscode p4-dhi || true
+```
+
 Run the baseline sandbox:
 
 ```bash
