@@ -41,8 +41,8 @@ The released plugin sends run-command blocks to the first terminal tab
 instead of the focused one. The fix lives on branch
 `fix/run-command-active-tab` (PR
 <https://github.com/docker/docker-labspace-cli/pull/25>) and is not in a
-tagged release yet. To run it before the release lands, build and install
-the plugin from source:
+tagged release yet. To run it before the release lands, install the
+plugin from source **instead of** the release download above:
 
 ```bash
 git clone git@github.com:docker/docker-labspace-cli.git
@@ -54,11 +54,17 @@ docker labspace version
 
 `make install` builds the binary in Docker, installs it to
 `~/.docker/cli-plugins/docker-labspace`, and ad-hoc signs it on macOS.
-Note that the terminal UI is served by the workspace image
-(`dockersamples/labspace-content-dev`), so this source build only changes
-behavior once that image is rebuilt from the merged change; until then,
-build your own workspace image from this branch if you need the fix live
-in the lab.
+This is the only rebuild needed: the terminal pane — tabs, run-command
+routing, and the active-tab fix — is served by this plugin, not by a
+container image. When the lab launches, the Compose `labspace` provider
+spawns `docker-labspace serve` on the host at `http://localhost:8085`,
+and the terminal UI is embedded in the binary. The
+`dockersamples/labspace-content-dev` image only serves the lab content
+page and posts commands to that host server, so it does not need to be
+rebuilt.
+
+After installing, just relaunch the lab as in **Run** below; the focused
+tab will receive run-command blocks.
 
 ## Run
 
