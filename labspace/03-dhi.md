@@ -16,13 +16,13 @@ creating `p4-dhi`, remove and recreate that sandbox before continuing.
 If the best-practices sandbox is still open, press `Ctrl+C` twice: once
 to stop Claude, and once more to exit the SBX session.
 
-Remove whatever sandbox currently holds this workspace before creating
-the DHI one. A sandbox is keyed to its directory and agent, not its
-`--name`, so the directory can only own one at a time (this clears every
-demo sandbox name, so it works regardless of which step you ran last):
+Reset the workspace before creating the DHI sandbox. This clears whatever
+sandbox holds the workspace (a sandbox is keyed to its directory and
+agent, so only one can hold it at a time) and removes the previous step's
+`Dockerfile`, so the DHI run starts from the same clean app:
 
 ```bash
-sbx rm -f p1-yolo p2-best-practices p2-vscode p4-dhi || true
+cd ~/.labspace/project && ./scripts/reset-demo.sh
 ```
 
 Inspect the kit:
@@ -171,16 +171,15 @@ vulnerability comparison as the demo evidence.
 Clean up when finished:
 
 ```bash
-sbx rm -f p1-yolo p2-best-practices p2-vscode p4-dhi
-cd ~/.labspace/project
-./scripts/reset-demo.sh
+cd ~/.labspace/project && ./scripts/reset-demo.sh
 ```
 
-The reset script removes generated files such as the agent-created
-`Dockerfile` by restoring `demo/sample-app` to its initial nested Git
-commit. The checked-in `Dockerfile.baseline` and `Dockerfile.dhi` stay
-available for the deterministic Hub / Scout evidence pushes. The
-Labspace teardown script also runs this cleanup when the lab is stopped.
+The reset script removes the demo sandboxes and the agent-created
+`Dockerfile`, leaving `demo/sample-app` at its clean starting state so you
+can run the whole demo again without redoing Step 0. The sample sources
+and the checked-in `Dockerfile.baseline` / `Dockerfile.dhi` (used for the
+deterministic Hub / Scout evidence pushes) are left intact. The Labspace
+teardown script also runs this cleanup when the lab is stopped.
 
 ## Where This Leads: AI Governance
 

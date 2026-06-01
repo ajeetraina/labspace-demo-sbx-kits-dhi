@@ -119,10 +119,11 @@ sbx kit validate ./kits/container-best-practices
 sbx kit validate ./kits/dhi
 ```
 
-Reset the sample app before each demo pass. This creates the app's
-nested Git repo if needed, removes old demo sandboxes, and restores the
-sample app to the initial state so the agent can create `Dockerfile`
-again:
+Reset the sample app before each demo pass. This removes the old demo
+sandboxes and the agent-generated `Dockerfile` from any previous run, so
+the agent can create `Dockerfile` again from a clean app. The sample
+sources and the checked-in `Dockerfile.baseline` / `Dockerfile.dhi` are
+left intact, so you can repeat the demo without redoing this Step 0:
 
 ```bash
 cd ~/.labspace/project && ./scripts/reset-demo.sh

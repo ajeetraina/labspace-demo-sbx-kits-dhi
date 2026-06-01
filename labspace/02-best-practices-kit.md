@@ -5,14 +5,13 @@ Now run the same task with a generic container best-practices kit attached.
 If the plain sandbox is still open, press `Ctrl+C` twice: once to stop
 Claude, and once more to exit the SBX session.
 
-A sandbox is keyed to its workspace directory and agent, not to its
-`--name`, so this directory can only own one sandbox at a time. Remove
-whatever sandbox currently holds this workspace before creating the
-kit-guided one (this clears every demo sandbox name, so it works no
-matter which step you ran last):
+Reset the workspace before creating the kit-guided sandbox. This clears
+any sandbox holding the workspace (a sandbox is keyed to its directory and
+agent, so only one can own it at a time) and removes the `Dockerfile` the
+previous step's agent wrote, so this run starts from the same clean app:
 
 ```bash
-sbx rm -f p1-yolo p2-best-practices p2-vscode p4-dhi || true
+cd ~/.labspace/project && ./scripts/reset-demo.sh
 ```
 
 Inspect the kit:
@@ -111,13 +110,14 @@ Use this as an optional branch of the demo, not the main path. The first
 run downloads code-server and the Claude Code VS Code extension, so
 pre-warm it before a live audience if you want to show it.
 
-First stop the previous Claude session with `Ctrl+C` twice. The sandbox
-currently holding this workspace is `p2-best-practices` — the `--name`
-does not matter, the directory can only own one sandbox at a time — so
-clear every demo sandbox name before creating the VS Code one:
+First stop the previous Claude session with `Ctrl+C` twice, then reset the
+workspace. The sandbox currently holding it is `p2-best-practices` (the
+`--name` does not matter — the directory can only own one at a time), and
+the reset also clears the previous Dockerfile so the VS Code run starts
+clean:
 
 ```bash
-sbx rm -f p1-yolo p2-best-practices p2-vscode p4-dhi || true
+cd ~/.labspace/project && ./scripts/reset-demo.sh
 ```
 
 Create the sandbox with both kits:

@@ -21,14 +21,16 @@ cat src/server.ts
 cat src/app.ts
 ```
 
-Each Docker Sandbox is keyed to its workspace directory and agent, not to
-the `--name` you give it, so this directory can only own one sandbox at a
-time. Before starting any sandbox here, clear out any sandbox left over
-from a previous run or step (this removes every demo sandbox name, so it
-works no matter what ran last):
+Reset the workspace before starting. This removes any leftover demo
+sandboxes and the agent-generated `Dockerfile` from a previous run, so the
+agent starts from a clean app every time (the sample sources and the
+checked-in `Dockerfile.baseline` / `Dockerfile.dhi` are left intact). A
+sandbox is keyed to its workspace directory and agent, not to its
+`--name`, so only one can own this directory at a time — the reset clears
+them all:
 
 ```bash
-sbx rm -f p1-yolo p2-best-practices p2-vscode p4-dhi || true
+cd ~/.labspace/project && ./scripts/reset-demo.sh
 ```
 
 Run the baseline sandbox:

@@ -3,30 +3,30 @@ set -eu
 
 repo_root=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
 sample_dir="$repo_root/demo/sample-app"
-sample_root=$(cd "$sample_dir" && pwd -P)
 
+# Remove the demo sandboxes. Each sandbox is keyed on its workspace directory
+# plus agent, so only one can own demo/sample-app at a time; clearing them frees
+# the workspace for the next run.
 if command -v sbx >/dev/null 2>&1; then
   sbx rm -f prewarm p1-yolo p2-best-practices p2-vscode p4-dhi >/dev/null 2>&1 || true
 fi
 
-git_root=
-if git -C "$sample_dir" rev-parse --show-toplevel >/dev/null 2>&1; then
-  git_root=$(git -C "$sample_dir" rev-parse --show-toplevel)
-fi
+# Remove only the artifacts the agent generates during the demo, so the next
+# pass starts from the same clean state. The agent's task is to write a
+# Dockerfile and build the image; the Dockerfile is the one file it adds to the
+# workspace (the image itself lives in the sandbox's Docker daemon and is
+# removed with the sandbox above).
+#
+# The sample app sources (src/, public/, package*.json, tsconfig.json,
+# .dockerignore, ...) and the checked-in Dockerfile.baseline / Dockerfile.dhi
+# used for the deterministic Hub / Scout pushes are intentionally left intact.
+rm -f "$sample_dir/Dockerfile"
 
-if [ "$git_root" != "$sample_root" ]; then
-  git -C "$sample_dir" init -q -b main
-fi
+# Older versions of this script seeded a nested git repo here to snapshot the
+# "initial state". That snapshot went stale as the sample app changed and could
+# delete current sources on reset, so it is no longer used. Remove any leftover
+# nested repo if present.
+rm -rf "$sample_dir/.git"
 
-if ! git -C "$sample_dir" rev-parse --verify HEAD >/dev/null 2>&1; then
-  git -C "$sample_dir" add .
-  git -C "$sample_dir" \
-    -c user.email=demo@example.com \
-    -c user.name=demo \
-    commit -q -m "init: leaddev sample app"
-else
-  git -C "$sample_dir" reset --hard HEAD >/dev/null
-  git -C "$sample_dir" clean -fd >/dev/null
-fi
-
-echo "Reset demo sandboxes and restored demo/sample-app to its initial git state."
+echo "Reset complete: removed demo sandboxes and the agent-generated Dockerfile."
+echo "Sample app sources and Dockerfile.baseline / Dockerfile.dhi are untouched."
