@@ -50,15 +50,18 @@ If Docker Hub rejects the first push with `denied`, create that
 repository in Docker Hub under the same namespace and rerun the push
 block.
 
-Register the Docker Hub and `dhi.io` auth placeholders. When prompted,
-paste the PAT and press Enter. Input is hidden.
+Register the Docker Hub and `dhi.io` auth placeholders. This block reads
+the PAT interactively, which the run button cannot drive (it would feed
+the script's own lines into the hidden prompt), so the block below has no
+run button. **Use its Copy button and paste it into the terminal
+yourself.** When prompted, paste the PAT and press Enter. Input is hidden.
 
 This does not put the PAT in the sandbox VM. The `dhi` kit writes a
 Docker config with fake auth placeholders; host-side SBX custom secrets
 replace those placeholders only when outbound registry requests pass
 through the SBX proxy.
 
-```bash
+```bash no-run-button
 DOCKERHUB_USERNAME="$$dockerUsername$$" bash <<'SCRIPT'
 set -euo pipefail
 
@@ -122,7 +125,7 @@ sample app to the initial state so the agent can create `Dockerfile`
 again:
 
 ```bash
-./scripts/reset-demo.sh
+cd ~/.labspace/project && ./scripts/reset-demo.sh
 ```
 
 Optional: pre-pull the Claude sandbox template so the first demo command
