@@ -98,9 +98,9 @@ dhi.io/node:24-debian13
 
 ## Publish the DHI Tag
 
-Use this after Claude has shown that the DHI kit is active. It pushes a
-deterministic DHI image from the checked-in `Dockerfile.dhi` under the
-same Docker namespace as the baseline tag:
+Use this after Claude has shown that the DHI kit is active. It pushes the
+DHI image the agent just built (from the `Dockerfile` it wrote with the
+DHI kit) under the same Docker namespace as the baseline tag:
 
 ```bash
 ! bash <<'SCRIPT'
@@ -120,10 +120,15 @@ esac
 
 docker buildx build --push --platform "$PLATFORM" \
   --sbom=true --provenance=mode=max \
-  -f Dockerfile.dhi \
+  -f Dockerfile \
   -t "${IMAGE}:sbx-dhi-dhi" .
 SCRIPT
 ```
+
+Both comparison tags persist on Docker Hub and Scout. When you repeat the
+demo for someone new, you can skip the push steps and just open a
+comparison from an earlier run — you only need to push again when you
+want fresh images.
 
 Talking point: this sandbox has the DHI kit, so Docker Hub and `dhi.io`
 auth are both placeholder-managed. The image push creates shareable Hub /
@@ -175,11 +180,11 @@ cd ~/.labspace/project && ./scripts/reset-demo.sh
 ```
 
 The reset script removes the demo sandboxes and the agent-created
-`Dockerfile`, leaving `demo/sample-app` at its clean starting state so you
-can run the whole demo again without redoing Step 0. The sample sources
-and the checked-in `Dockerfile.baseline` / `Dockerfile.dhi` (used for the
-deterministic Hub / Scout evidence pushes) are left intact. The Labspace
-teardown script also runs this cleanup when the lab is stopped.
+`Dockerfile`, leaving `demo/sample-app` with only its app sources (no
+Dockerfile at all) so you can run the whole demo again without redoing
+Step 0. The comparison tags you pushed stay on Docker Hub / Scout, so a
+repeat run can reuse them. The Labspace teardown script also runs this
+cleanup when the lab is stopped.
 
 ## Where This Leads: AI Governance
 

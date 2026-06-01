@@ -23,11 +23,10 @@ cat src/app.ts
 
 Reset the workspace before starting. This removes any leftover demo
 sandboxes and the agent-generated `Dockerfile` from a previous run, so the
-agent starts from a clean app every time (the sample sources and the
-checked-in `Dockerfile.baseline` / `Dockerfile.dhi` are left intact). A
-sandbox is keyed to its workspace directory and agent, not to its
-`--name`, so only one can own this directory at a time — the reset clears
-them all:
+agent starts from a clean app with no Dockerfile at all (only the app
+sources remain). A sandbox is keyed to its workspace directory and agent,
+not to its `--name`, so only one can own this directory at a time — the
+reset clears them all:
 
 ```bash
 cd ~/.labspace/project && ./scripts/reset-demo.sh
@@ -155,9 +154,9 @@ guidance.
 
 ## Publish the Baseline Tag
 
-Use this only after the agent has finished the baseline pass. It pushes a
-deterministic baseline image from the checked-in `Dockerfile.baseline`
-under the Docker namespace from Step 0:
+Use this only after the agent has finished the baseline pass. It pushes
+the image the agent just built (from the `Dockerfile` it wrote) as the
+baseline comparison tag, under the Docker namespace from Step 0:
 
 ```bash
 ! bash <<'SCRIPT'
@@ -188,10 +187,14 @@ JSON
 
 docker buildx build --push --platform "$PLATFORM" \
   --sbom=true --provenance=mode=max \
-  -f Dockerfile.baseline \
+  -f Dockerfile \
   -t "${IMAGE}:sbx-dhi-baseline" .
 SCRIPT
 ```
+
+This tag stays on Docker Hub. If you are re-running the demo for a new
+audience, you do not have to push it again every time — you can skip
+ahead and open a comparison you pushed earlier.
 
 Talking point: this still does not put the real PAT in the sandbox VM.
 The Docker config contains the fake auth placeholder from Step 0; SBX

@@ -8,9 +8,7 @@ are the source of truth for the demo flow.
 
 ```text
 project/
-├── demo/sample-app/                 # TypeScript Node sample app
-│   ├── Dockerfile.baseline          # Deterministic Docker Official Image baseline
-│   └── Dockerfile.dhi               # Deterministic Docker Hardened Images version
+├── demo/sample-app/                 # TypeScript Node sample app (no Dockerfile; the agent writes one)
 ├── kits/container-best-practices/   # hadolint + container guidance skill
 ├── kits/dhi/                        # DHI CLI + auth placeholders + DHI skill
 └── scripts/                         # optional local helper scripts

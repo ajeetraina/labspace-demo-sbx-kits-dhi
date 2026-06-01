@@ -121,9 +121,10 @@ sbx kit validate ./kits/dhi
 
 Reset the sample app before each demo pass. This removes the old demo
 sandboxes and the agent-generated `Dockerfile` from any previous run, so
-the agent can create `Dockerfile` again from a clean app. The sample
-sources and the checked-in `Dockerfile.baseline` / `Dockerfile.dhi` are
-left intact, so you can repeat the demo without redoing this Step 0:
+the agent can create `Dockerfile` again from a clean app that ships no
+Dockerfile of its own. Only the agent's artifacts are removed; the app
+sources are left intact, so you can repeat the demo without redoing this
+Step 0:
 
 ```bash
 cd ~/.labspace/project && ./scripts/reset-demo.sh

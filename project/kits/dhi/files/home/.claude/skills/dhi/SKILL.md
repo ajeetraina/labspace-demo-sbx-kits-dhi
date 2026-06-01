@@ -52,14 +52,10 @@ After `docker build -t <name>:<tag> .`, collect at least:
 docker image inspect <name>:<tag> --format '{{.Id}} {{.Size}} {{.Config.User}}'
 ```
 
-For this repository's demo, build both comparison images when the
-Dockerfiles are present:
-
-```bash
-docker build -t app:baseline -f Dockerfile.baseline .
-docker build -t app:dhi -f Dockerfile.dhi .
-docker image inspect app:baseline app:dhi --format '{{join .RepoTags ","}} {{.Size}} bytes {{.Config.User}}'
-```
+The app does not ship a reference Dockerfile; you write it. The
+baseline-vs-DHI comparison comes from the pushed Docker Hub tags — the
+earlier plain pass pushes the baseline image it built, and this DHI pass
+pushes the DHI image you build — not from any local reference Dockerfile.
 
 The preferred visual proof is the Docker Hub / Docker Scout Dashboard
 comparison after the baseline and DHI tags are pushed. If pushing a

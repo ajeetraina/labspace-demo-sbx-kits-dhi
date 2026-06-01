@@ -12,14 +12,11 @@ if command -v sbx >/dev/null 2>&1; then
 fi
 
 # Remove only the artifacts the agent generates during the demo, so the next
-# pass starts from the same clean state. The agent's task is to write a
-# Dockerfile and build the image; the Dockerfile is the one file it adds to the
-# workspace (the image itself lives in the sandbox's Docker daemon and is
-# removed with the sandbox above).
-#
-# The sample app sources (src/, public/, package*.json, tsconfig.json,
-# .dockerignore, ...) and the checked-in Dockerfile.baseline / Dockerfile.dhi
-# used for the deterministic Hub / Scout pushes are intentionally left intact.
+# pass starts from the same clean state. The app ships no Dockerfile of its
+# own; the agent writes one as its task, and that Dockerfile is the single file
+# it adds to the workspace (the image itself lives in the sandbox's Docker
+# daemon and is removed with the sandbox above). The app sources (src/, public/,
+# package*.json, tsconfig.json, .dockerignore, ...) are left intact.
 rm -f "$sample_dir/Dockerfile"
 
 # Older versions of this script seeded a nested git repo here to snapshot the
@@ -29,4 +26,4 @@ rm -f "$sample_dir/Dockerfile"
 rm -rf "$sample_dir/.git"
 
 echo "Reset complete: removed demo sandboxes and the agent-generated Dockerfile."
-echo "Sample app sources and Dockerfile.baseline / Dockerfile.dhi are untouched."
+echo "Sample app sources are untouched."
