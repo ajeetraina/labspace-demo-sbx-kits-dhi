@@ -19,37 +19,22 @@ git pull --ff-only
 
 ## Install Labspace
 
-Install or update the Docker Labspace CLI plugin:
+> **Required for now: build the plugin from source.** The released plugin
+> (`v0.6.0`) sends run-command blocks to the *first* terminal tab instead
+> of the focused one. The fix is on branch `fix/run-command-active-tab`
+> (PR <https://github.com/docker/docker-labspace-cli/pull/25>) and is not
+> in a tagged release yet, so until it ships you must install from source
+> to get correct tab behavior. Use the **Build from source** steps below,
+> not the release download.
 
-```bash
-gh release download v0.6.0 \
-  --repo docker/docker-labspace-cli \
-  --pattern docker-labspace-darwin-arm64 \
-  --pattern checksums.sha256
-shasum -a 256 -c checksums.sha256 --ignore-missing
-mkdir -p ~/.docker/cli-plugins ~/.local/bin
-install -m 0755 docker-labspace-darwin-arm64 ~/.docker/cli-plugins/docker-labspace
-ln -sf ~/.docker/cli-plugins/docker-labspace ~/.local/bin/labspace
-docker labspace version
-```
-
-Start Docker Desktop before launching the lab.
-
-### Build the CLI from source (active-tab terminal fix)
-
-The released plugin sends run-command blocks to the first terminal tab
-instead of the focused one. The fix lives on branch
-`fix/run-command-active-tab` (PR
-<https://github.com/docker/docker-labspace-cli/pull/25>) and is not in a
-tagged release yet. To run it before the release lands, install the
-plugin from source **instead of** the release download above:
+### Build from source (current recommended install)
 
 ```bash
 git clone git@github.com:docker/docker-labspace-cli.git
 cd docker-labspace-cli
 git checkout fix/run-command-active-tab   # drop once merged to main
 make install
-docker labspace version
+docker labspace version   # expect v0.6.0-<n>-g<sha>, the fix-branch build
 ```
 
 `make install` builds the binary in Docker, installs it to
@@ -63,8 +48,29 @@ and the terminal UI is embedded in the binary. The
 page and posts commands to that host server, so it does not need to be
 rebuilt.
 
-After installing, just relaunch the lab as in **Run** below; the focused
-tab will receive run-command blocks.
+### Release download (only once the fix ships)
+
+After PR #25 is merged and included in a tagged release, skip the source
+build and install the release directly:
+
+```bash
+gh release download v0.6.0 \
+  --repo docker/docker-labspace-cli \
+  --pattern docker-labspace-darwin-arm64 \
+  --pattern checksums.sha256
+shasum -a 256 -c checksums.sha256 --ignore-missing
+mkdir -p ~/.docker/cli-plugins ~/.local/bin
+install -m 0755 docker-labspace-darwin-arm64 ~/.docker/cli-plugins/docker-labspace
+ln -sf ~/.docker/cli-plugins/docker-labspace ~/.local/bin/labspace
+docker labspace version
+```
+
+(Bump `v0.6.0` to the release tag that actually contains the active-tab
+fix.)
+
+Start Docker Desktop before launching the lab. After installing, launch
+as in **Run** below; the focused tab will then receive run-command
+blocks.
 
 ## Run
 
