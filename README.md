@@ -64,12 +64,9 @@ Terminal: http://localhost:8085
 
 Inside the Labspace terminal, follow Step 0.
 
-If the Labspace base content pull returns `401 Unauthorized`, log in to
-Docker Hub on the host with a PAT, then run the command again:
+> [!TIP]
+> If the content pull returns `401 Unauthorized`, run `docker login` on the host and launch again.
 
-```bash
-docker login
-```
 
 ## Contents
 
