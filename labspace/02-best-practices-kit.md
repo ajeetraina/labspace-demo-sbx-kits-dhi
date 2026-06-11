@@ -2,6 +2,17 @@
 
 Now run the same task with a generic container best-practices kit attached.
 
+## Learning objectives
+
+In this section, you will complete the following objectives:
+ 
+- Attach a container best-practices kit to a sandbox with `--kit`
+- See how a kit installs pinned tools and ships shared agent guidance (skills)
+- Compare the kit-guided agent output against the plain sandbox baseline
+- Optionally stack the contributed `code-server` kit to run VS Code inside the sandbox.
+
+## Inspect the kit
+
 If the plain sandbox is still open, press `Ctrl+C` twice: once to stop
 Claude, and once more to exit the SBX session.
 
@@ -20,7 +31,7 @@ Inspect the kit:
 cd ~/.labspace/project
 ```
 
-Talking point: kits make sandboxes repeatable and shareable. One
+**Talking point:** kits make sandboxes repeatable and shareable. One
 `spec.yaml` gives an agent the tools, credentials, network rules, files,
 startup commands, and guidance it needs to do real work the same way
 every time.
@@ -29,16 +40,17 @@ every time.
 sbx kit inspect ./kits/container-best-practices
 ```
 
-Talking point: this shows what SBX attaches to the sandbox. The kit is
-declarative configuration applied with `--kit`; it is not a custom
-Docker image and it is not a long setup prompt pasted into Claude. Kits
-are currently an Early Access / experimental feature.
+> [!NOTE]
+> This shows what SBX attaches to the sandbox. The kit is declarative
+> configuration applied with `--kit`; it is not a custom Docker image and
+> it is not a long setup prompt pasted into Claude. Kits are currently an
+> Early Access / experimental feature.
 
 ```bash
 cat ./kits/container-best-practices/spec.yaml
 ```
 
-Point attention to `commands.install`: the kit adds tools at sandbox
+**Point attention to** `commands.install`: the kit adds tools at sandbox
 creation. Point at `network.allowedDomains`: the kit also defines what
 this agent setup can reach. Later, the DHI kit uses proxy-managed
 credentials, where the real secret stays on the host and the sandbox
@@ -48,11 +60,13 @@ only sees placeholders.
 cat ./kits/container-best-practices/files/home/.claude/skills/container-best-practices/SKILL.md
 ```
 
-Point attention to the skill rules: this is the repeatable agent
+**Point attention to** the skill rules: this is the repeatable agent
 behavior the kit ships to every sandbox. For an individual developer,
 that means saving setup once. For a team, it means every engineer gets
 the same agent environment. For a platform team, it means one reviewed
 boundary for tools, network, and credentials.
+
+## Run the sandbox with the kit
 
 Start a fresh sandbox with the kit:
 
@@ -71,7 +85,7 @@ prompt into that Claude session:
 Containerize this app. Build the image and run it.
 ```
 
-Talking point: call out the first lines of Claude output. You should
+**Talking point:** call out the first lines of Claude output. You should
 see `Skill(container-best-practices)` and `Successfully loaded skill`.
 That is the visible handoff from the kit into the agent's behavior.
 
@@ -91,12 +105,12 @@ If you want one quick live check after Claude finishes, use this:
 ! hadolint Dockerfile
 ```
 
-Talking point: the important part is not the specific Dockerfile advice.
+**Talking point:** the important part is not the specific Dockerfile advice.
 The important part is that the sandbox got the same tool and the same
 agent guidance from a reusable kit. That setup can be shared locally,
 stored in Git, packaged as an OCI artifact, or owned by a platform team.
 
-The lesson: a kit is reusable, versioned guidance. It gives every agent
+**The lesson:** a kit is reusable, versioned guidance. It gives every agent
 the same baseline without rebuilding the agent image or rewriting prompts
 by hand.
 
@@ -106,9 +120,10 @@ If you want a more visual kit moment, stack the contributed
 `code-server` kit with the best-practices kit. This starts web VS Code
 inside the sandbox, opened on the same workspace Claude is using.
 
-Use this as an optional branch of the demo, not the main path. The first
-run downloads code-server and the Claude Code VS Code extension, so
-pre-warm it before a live audience if you want to show it.
+> [!NOTE]
+> Use this as an optional branch of the demo, not the main path. The first
+> run downloads code-server and the Claude Code VS Code extension, so
+> pre-warm it before a live audience if you want to show it.
 
 First stop the previous Claude session with `Ctrl+C` twice, then reset the
 workspace. The sandbox currently holding it is `p2-best-practices` (the
@@ -150,7 +165,7 @@ If the page does not load, check the sandbox-side service log:
 sbx exec p2-vscode -- cat /tmp/code-server.log
 ```
 
-Talking point: this is still the same sandbox boundary. VS Code runs
+**Talking point:**  this is still the same sandbox boundary. VS Code runs
 inside the sandbox and is exposed only through an explicit localhost
 port publish. The kit added a background service, startup command, and
 editor configuration without rebuilding the underlying Claude sandbox
@@ -168,7 +183,7 @@ https://docs.docker.com/ai/sandboxes/customize/kits/
 https://github.com/docker/sbx-kits-contrib
 ```
 
-Talking point: this is the shareability story. A team can keep its kit
+**Talking point:** this is the shareability story. A team can keep its kit
 in Git, pin it by branch, tag, or commit, and use it the same way across
 agents. The `code-server` kit we just used came from that ecosystem:
 
@@ -176,7 +191,7 @@ agents. The `code-server` kit we just used came from that ecosystem:
 sbx run claude --kit "git+https://github.com/docker/sbx-kits-contrib.git#dir=code-server"
 ```
 
-What to say: individual developers save their setup once; teams share a
+**What to say:** individual developers save their setup once; teams share a
 known-good setup; platform teams publish the approved tools, network
 rules, startup services, and credential patterns. Vendors can package
 their own agent or integration as a kit instead of writing long install
