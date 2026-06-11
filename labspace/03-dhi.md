@@ -6,12 +6,24 @@ maintained by Docker. The `dhi` kit tells the agent to use DHI for both
 build and runtime stages, then collect image evidence that can be shown
 in Docker Hub / Docker Scout Dashboard after push.
 
-This step expects the Docker credentials from Step 0. The `dhi` kit
-writes Docker auth placeholders into `~/.docker/config.json` for Docker
-Hub and `dhi.io`. Step 0 registers host-side SBX custom secrets, and the
-proxy rewrites outbound registry auth so the real credential does not
-enter the sandbox VM. If you added or changed those secrets after
-creating `p4-dhi`, remove and recreate that sandbox before continuing.
+## Learning objectives
+ 
+In this section, you will complete the following objectives:
+ 
+- Layer a DHI kit so the agent uses Docker Hardened Images for both build and runtime stages
+- Keep Docker Hub and `dhi.io` credentials host-managed through proxy placeholders
+- Publish the DHI image tag and compare it with the baseline in Docker Hub / Docker Scout
+- See how this developer workflow leads into Docker AI Governance.
+
+## 🔍 Inspect the kit
+
+> [!IMPORTANT]
+> This step expects the Docker credentials from Step 0. The `dhi` kit
+> writes Docker auth placeholders into `~/.docker/config.json` for Docker
+> Hub and `dhi.io`. Step 0 registers host-side SBX custom secrets, and the
+> proxy rewrites outbound registry auth so the real credential does not
+> enter the sandbox VM. If you added or changed those secrets after
+> creating `p4-dhi`, remove and recreate that sandbox before continuing.
 
 If the best-practices sandbox is still open, press `Ctrl+C` twice: once
 to stop Claude, and once more to exit the SBX session.
@@ -40,7 +52,7 @@ rules, and registry access.
 sbx kit inspect ./kits/dhi
 ```
 
-Point attention to the kit name, display name, and install/startup
+**Point attention to** the kit name, display name, and install/startup
 steps. This is what SBX applies when `--kit ../../kits/dhi` is added to
 the sandbox command.
 
@@ -48,7 +60,7 @@ the sandbox command.
 cat ./kits/dhi/spec.yaml
 ```
 
-Point attention to the DHI CLI install, `network.allowedDomains`, and
+**Point attention to** the DHI CLI install, `network.allowedDomains`, and
 `configure-dhi-auth`. The important demo message is that the sandbox
 gets DHI tooling and placeholder auth config at startup, while the real
 Docker credential stays host-managed and is applied by the proxy.
@@ -57,17 +69,19 @@ Docker credential stays host-managed and is applied by the proxy.
 cat ./kits/dhi/files/home/.claude/skills/dhi/SKILL.md
 ```
 
-Point attention to the skill rules: use DHI for every build/runtime base
+**Point attention to** the skill rules: use DHI for every build/runtime base
 image, use `dhi.io/node:24-debian13-dev` and
 `dhi.io/node:24-debian13` for this Node demo, and collect evidence for
 Hub / Scout Dashboard review after push. DHI is the base-image policy;
 the kit makes that policy executable for the agent.
 
-Talking point: this is intentionally the same user task as before. The
+**Talking point:** this is intentionally the same user task as before. The
 difference is the kit stack. The DHI skill says that, when this kit is
 installed, it has base-image precedence for containerization tasks, so
 the agent should know about DHI without the user having to spell it out
 in the prompt.
+
+## Run the sandbox with both kits
 
 Run a fresh sandbox with both kits:
 
@@ -85,7 +99,7 @@ prompt as before into that Claude session:
 Containerize this app. Build the image and run it.
 ```
 
-Talking point: call out the first lines of Claude output. You should
+**Talking point:**  call out the first lines of Claude output. You should
 see `Skill(dhi)` and `Successfully loaded skill`. This is the proof that
 the same user prompt is now interpreted through the DHI kit.
 
@@ -125,14 +139,17 @@ docker buildx build --push --platform "$PLATFORM" \
 SCRIPT
 ```
 
-Both comparison tags persist on Docker Hub and Scout. When you repeat the
-demo for someone new, you can skip the push steps and just open a
-comparison from an earlier run — you only need to push again when you
-want fresh images.
+> [!TIP]
+> Both comparison tags persist on Docker Hub and Scout. When you repeat the
+> demo for someone new, you can skip the push steps and just open a
+> comparison from an earlier run — you only need to push again when you
+> want fresh images.
 
-Talking point: this sandbox has the DHI kit, so Docker Hub and `dhi.io`
+**Talking point:** this sandbox has the DHI kit, so Docker Hub and `dhi.io`
 auth are both placeholder-managed. The image push creates shareable Hub /
 Scout evidence without exposing the real PAT inside the VM.
+
+## Compare baseline vs DHI
 
 The local sandbox proves the agent can use the DHI policy. The pushed
 tags make the result shareable. Open the Hub tags page and point at the
@@ -160,18 +177,21 @@ In Scout, select `sbx-dhi-baseline` and `sbx-dhi-dhi`, then click
 Compare. Use the comparison to show how a minimal DHI runtime changes
 image size, package count, and vulnerability findings.
 
-Talking point: do not make this section about in-sandbox Scout CLI
+**Talking point:**  do not make this section about in-sandbox Scout CLI
 auth. The demo value is that the same prompt plus a different kit stack
 produces a DHI-based image, and the pushed tags give a shareable Hub /
 Scout view for size, packages, and vulnerabilities.
 
-The `No outdated base images` and `No unapproved base images` cards are
-generic base-image policies. If they show `No data` for the DHI tag, do
-not present that as a DHI failure. For DHI child images, the important
-build flags are `--sbom=true` and `--provenance=mode=max`; Scout uses
-max-mode provenance to trace DHI base-image lineage and apply DHI VEX
-statements. Then use the DHI-specific evidence, package count, size, and
-vulnerability comparison as the demo evidence.
+> [!NOTE]
+> The `No outdated base images` and `No unapproved base images` cards are
+> generic base-image policies. If they show `No data` for the DHI tag, do
+> not present that as a DHI failure. For DHI child images, the important
+> build flags are `--sbom=true` and `--provenance=mode=max`; Scout uses
+> max-mode provenance to trace DHI base-image lineage and apply DHI VEX
+> statements. Then use the DHI-specific evidence, package count, size, and
+> vulnerability comparison as the demo evidence.
+
+## Clean up
 
 Clean up when finished:
 
@@ -195,7 +215,7 @@ team actually adopts agents?"
 https://www.docker.com/products/ai-governance/
 ```
 
-Talking point: Docker Sandboxes give the infrastructure isolation: the
+**Talking point:**  Docker Sandboxes give the infrastructure isolation: the
 agent gets a real shell, Docker daemon, filesystem, and network, but
 inside a disposable sandbox. Kits make that setup repeatable and
 shareable. The next layer is organization governance: centralized
@@ -203,7 +223,7 @@ policies for what agents can reach, which filesystem mounts they get,
 which MCP servers and tools are approved, and what audit trail exists
 for security teams.
 
-The handoff line: "Today we showed the developer workflow. The same
+**The handoff line:** "Today we showed the developer workflow. The same
 boundary needs to become an organization control plane: access rules,
 monitoring, audit, and MCP governance. That is the direction Docker is
 building toward with Docker AI Governance."

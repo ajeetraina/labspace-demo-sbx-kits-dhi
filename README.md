@@ -1,8 +1,20 @@
-# SBX Kits DHI Labspace
+# Labspace - SBX Kits and Docker Hardened Images
 
-This is the Labspace wrapper for the SBX kits and Docker Hardened Images demo.
+This Labspace shows how to run AI coding agents inside isolated [Docker Sandboxes](https://docs.docker.com/ai/sandboxes/) (`sbx`) and progressively harden what the agent produces using sbx **kits** and **Docker Hardened Images (DHI)**.
 
 The Labspace uses the host-backed `ttyd` provider from the Docker Labspace CLI plugin so `sbx` can create sandboxes with host access. The demo payload lives under `project/`.
+
+## Learning objectives
+ 
+By the end of this Labspace, you will have learned the following:
+ 
+- How to run an AI coding agent (Claude) in an isolated Docker Sandbox microVM with its own daemon, filesystem, and network
+- How sandbox network policy allows approved development endpoints while denying everything else
+- What an sbx **kit** is: declarative, repeatable, shareable agent configuration (tools, credentials, network rules, files, startup commands, and guidance) defined in a single `spec.yaml`
+- How attaching a container best-practices kit changes the agent's output compared to a plain sandbox
+- How a DHI kit directs the agent to use Docker Hardened Images for both build and runtime stages
+- How to keep registry credentials on the host using sbx custom secrets, so the real Docker PAT never enters the sandbox VM
+- How to push baseline vs. DHI image tags and compare size, package count, vulnerabilities, and attestations (SBOM + provenance) in Docker Hub / Docker Scout
 
 ## Current State
 
@@ -11,7 +23,11 @@ records the current implementation state, how to relaunch the Labspace,
 what has already been verified, and the remaining real DHI credential
 check.
 
-## Local Development
+## Launch the Labspace
+
+> [!NOTE]
+> This Labspace uses a **host-backed terminal** so `sbx` can create Docker Sandboxes on your machine. Before launching, make sure you have Docker Desktop running, the `sbx` CLI installed and authenticated (`sbx login`), and a Docker Personal Access Token that can pull Docker Hardened Images. Step 0 of the lab walks through these prerequisites.
+
 
 Install or update the Docker Labspace CLI plugin:
 
@@ -39,7 +55,7 @@ For a one-off local launch without authoring watch mode:
 CONTENT_PATH=$PWD docker labspace launch ./compose.yaml -y
 ```
 
-Open:
+Open your browser:
 
 ```text
 Lab page: http://localhost:3030
@@ -48,12 +64,9 @@ Terminal: http://localhost:8085
 
 Inside the Labspace terminal, follow Step 0.
 
-If the Labspace base content pull returns `401 Unauthorized`, log in to
-Docker Hub on the host with a PAT, then run the command again:
+> [!TIP]
+> If the content pull returns `401 Unauthorized`, run `docker login` on the host and launch again.
 
-```bash
-docker login
-```
 
 ## Contents
 
@@ -61,3 +74,23 @@ docker login
 - `compose.override.yaml` switches the workspace to the Labspace `ttyd` provider and disables `host-republisher`.
 - `labspace/labspace.yaml` defines the lab metadata and sections.
 - `project/` contains the SBX kits demo.
+
+## Contributing
+ 
+If you find something wrong or something that needs to be updated, feel free to submit a PR. If you want to make a larger change, feel free to fork the repo into your own repository.
+ 
+**Important note:** If you fork it, you will need to update the GHA workflow to point to your own Hub repo.
+ 
+1. Clone this repo
+2. Start the Labspace in content development mode:
+```
+   # On Mac/Linux
+   CONTENT_PATH=$PWD docker compose up --watch
+ 
+   # On Windows with PowerShell
+   $Env:CONTENT_PATH = (Get-Location).Path; docker compose up --watch
+```
+ 
+3. Open the Labspace at <http://localhost:3030>.
+4. Make the necessary changes and validate they appear as you expect in the Labspace
+   Be sure to check out the [docs](https://github.com/dockersamples/labspace-infra/tree/main/docs) for additional information and guidelines.

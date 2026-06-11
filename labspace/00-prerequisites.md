@@ -4,6 +4,18 @@ This Labspace uses a host-backed terminal so `sbx` can create Docker
 Sandboxes from your machine. A Docker Sandbox runs the agent in an
 isolated microVM with its own Docker daemon, filesystem, and network.
 
+## Before you begin
+ 
+In this section, you will complete the following setup:
+ 
+- Confirm Docker and the `sbx` CLI are installed and authenticated
+- Create a Docker Personal Access Token (PAT) that can pull Docker Hardened Images
+- Register host-side SBX secrets so the real PAT never enters a sandbox VM
+- Validate the two kits packaged with this lab and reset the sample app to a clean state
+
+
+## Confirm Docker and SBX
+
 Confirm Docker and SBX are available:
 
 ```bash
@@ -23,8 +35,11 @@ If authentication fails, sign in:
 sbx login
 ```
 
-Prepare Docker credentials for the DHI step:
+## Prepare Docker credentials
 
+
+Prepare Docker credentials for the DHI step:
+ 
 1. Create a Docker Personal Access Token (PAT) from Docker Home:
    **Account settings** -> **Personal access tokens** -> **Generate token**.
 2. Use a Docker account or organization that can pull Docker Hardened
@@ -33,8 +48,9 @@ Prepare Docker credentials for the DHI step:
    lab publishes two comparison tags there.
 4. Copy the token once. Docker will not show it again.
 
-Use the PAT as the Docker registry password. Do not use the Docker
-account password for this lab.
+> [!IMPORTANT]
+> Use the PAT as the Docker registry password. Do not use the Docker
+> account password for this lab.
 
 Set the Docker username for the rest of this lab:
 
@@ -46,9 +62,12 @@ The lab uses this image repository for shareable Hub / Scout evidence:
 docker.io/$$dockerUsername$$/todo-demo-application
 ```
 
-If Docker Hub rejects the first push with `denied`, create that
-repository in Docker Hub under the same namespace and rerun the push
-block.
+> [!NOTE]
+> If Docker Hub rejects the first push with `denied`, create that
+> repository in Docker Hub under the same namespace and rerun the push
+> block.
+
+## Register the registry secrets
 
 Register the Docker Hub and `dhi.io` auth placeholders. This block reads
 the PAT interactively, which the run button cannot drive (it would feed
@@ -56,10 +75,11 @@ the script's own lines into the hidden prompt), so the block below has no
 run button. **Use its Copy button and paste it into the terminal
 yourself.** When prompted, paste the PAT and press Enter. Input is hidden.
 
-This does not put the PAT in the sandbox VM. The `dhi` kit writes a
-Docker config with fake auth placeholders; host-side SBX custom secrets
-replace those placeholders only when outbound registry requests pass
-through the SBX proxy.
+> [!IMPORTANT]
+> This does not put the PAT in the sandbox VM. The `dhi` kit writes a
+> Docker config with fake auth placeholders; host-side SBX custom secrets
+> replace those placeholders only when outbound registry requests pass
+> through the SBX proxy.
 
 ```bash no-run-button
 DOCKERHUB_USERNAME="$$dockerUsername$$" bash <<'SCRIPT'
@@ -107,9 +127,12 @@ Global secrets are used for new sandboxes. If you already created
 sbx rm -f p4-dhi
 ```
 
-Do not paste the Docker PAT into the sandbox. The sandbox should only
-receive proxy-managed placeholders; the real token stays on the host and
-the proxy rewrites the outbound registry auth request.
+> [!IMPORTANT]
+> Do not paste the Docker PAT into the sandbox. The sandbox should only
+> receive proxy-managed placeholders; the real token stays on the host and
+> the proxy rewrites the outbound registry auth request.
+
+## Validate the kits
 
 Validate the two kits packaged with the lab:
 
@@ -118,6 +141,8 @@ cd ~/.labspace/project
 sbx kit validate ./kits/container-best-practices
 sbx kit validate ./kits/dhi
 ```
+
+## Reset the sample app
 
 Reset the sample app before each demo pass. This removes the old demo
 sandboxes and the agent-generated `Dockerfile` from any previous run, so
@@ -130,8 +155,10 @@ Step 0:
 cd ~/.labspace/project && ./scripts/reset-demo.sh
 ```
 
-Optional: pre-pull the Claude sandbox template so the first demo command
-starts faster:
+> [!TIP]
+> Optional: pre-pull the Claude sandbox template so the first demo command
+> starts faster. Run the block below.
+
 
 ```bash
 sbx create --name prewarm claude /tmp && sbx rm -f prewarm

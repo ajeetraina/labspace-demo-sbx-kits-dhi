@@ -3,6 +3,17 @@
 First, let the agent containerize a small Node service in an isolated
 microVM sandbox with no kit attached.
 
+## Learning objectives
+ 
+In this section, you will complete the following objectives:
+ 
+- Run an AI coding agent inside an isolated Docker Sandbox microVM with no kit attached
+- Observe the sandbox's network policy allowing approved endpoints while denying others
+- Inspect the agent's unguided Dockerfile and image to see the quality bar it chose on its own
+- Publish the baseline image tag for later comparison
+
+## Run the baseline sandbox
+
 Open the sample app:
 
 ```bash
@@ -49,7 +60,7 @@ The sandbox gives the agent real tools, but inside its own Docker daemon,
 filesystem, and network. The agent can build, run, and test containers
 without touching your host system.
 
-## Show Network Policy
+## Show network policy
 
 With the Claude sandbox session still open, use the run button to send
 short shell escapes into that same sandbox. Development endpoints needed
@@ -63,7 +74,11 @@ by the sandbox can work, while unapproved destinations are denied:
 ! curl -fsS --max-time 8 https://example.com
 ```
 
-The `example.com` request should fail. Open another terminal tab with
+> [!NOTE]
+> The `example.com` request should fail.
+
+
+Open another terminal tab with
 the `+` button and use it to show the SBX control surface:
 
 ```bash
@@ -82,12 +97,12 @@ You can also show the active sandbox list from that tab:
 sbx ls
 ```
 
-Talking point: Docker Sandboxes are isolated microVM sandboxes, not just
+**Talking point:** Docker Sandboxes are isolated microVM sandboxes, not just
 containers. Each sandbox has a network policy boundary you can inspect
 and audit. We will use credentials later in the DHI step; this first
 section is only about isolation and network control.
 
-## Talking Points
+# Inspect the unguided output
 
 This first pass is intentionally unconstrained. Use these checks to see
 the quality bar the model chose by itself.
@@ -98,7 +113,7 @@ Inspect the Dockerfile:
 ! grep -nE "^[[:space:]]*FROM[[:space:]]" Dockerfile
 ```
 
-Talking point: every `FROM` line is a build stage. One line means a
+**Talking point:** every `FROM` line is a build stage. One line means a
 single-stage image; two or more lines means the agent chose a
 multi-stage build. Also call out whether the base is pinned, `latest`,
 slim, alpine, or something else.
@@ -129,7 +144,7 @@ Now try a Dockerfile linter:
 ! command -v hadolint >/dev/null && hadolint Dockerfile || echo "hadolint is not installed in this sandbox"
 ```
 
-Talking point: a default sandbox template ships a base environment, not
+**Talking point:** a default sandbox template ships a base environment, not
 your team's custom tooling. A linter like `hadolint` simply is not there.
 The agent could go install it on its own, but then you are letting an
 agent pull arbitrary, unpinned tools off the internet on every run, which
@@ -147,10 +162,11 @@ Use those outputs to answer:
 - Does it create `.dockerignore`?
 - Does it lint or verify the Dockerfile?
 
-The lesson: Docker Sandboxes give the agent a real shell and its own
+**The lesson:** Docker Sandboxes give the agent a real shell and its own
 Docker daemon inside an isolated microVM. The safety boundary is strong,
 but the output quality is still whatever the model decides without
 guidance.
+
 
 ## Publish the Baseline Tag
 
@@ -192,11 +208,12 @@ docker buildx build --push --platform "$PLATFORM" \
 SCRIPT
 ```
 
-This tag stays on Docker Hub. If you are re-running the demo for a new
-audience, you do not have to push it again every time — you can skip
-ahead and open a comparison you pushed earlier.
-
-Talking point: this still does not put the real PAT in the sandbox VM.
-The Docker config contains the fake auth placeholder from Step 0; SBX
-replaces it through the host-side proxy when the registry request leaves
-the sandbox.
+> [!TIP]
+> This tag stays on Docker Hub. If you are re-running the demo for a new
+> audience, you do not have to push it again every time — you can skip
+> ahead and open a comparison you pushed earlier.
+ 
+> [!IMPORTANT]
+> This still does not put the real PAT in the sandbox VM. The Docker
+> config contains the fake auth placeholder from Step 0; SBX replaces it
+> through the host-side proxy when the registry request leaves the sandbox.
