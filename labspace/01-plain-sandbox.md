@@ -43,6 +43,38 @@ reset clears them all:
 cd ~/.labspace/project && ./scripts/reset-demo.sh
 ```
 
+## Authenticate the agent (Anthropic)
+
+The `claude` agent runs inside the sandbox microVM and authenticates to the
+Anthropic API through the SBX proxy using the `anthropic` **service secret**.
+This is separate from the Docker registry secrets you set in Step 0. If it is
+not set, the agent starts but fails the first prompt with
+`Invalid API key · Fix external API key`.
+
+Register your Anthropic API key once on the host (global, so every sandbox in
+this lab can use it). The real key stays on the host; the proxy injects auth on
+outbound requests and it never enters the VM:
+
+```bash
+sbx secret set -g anthropic
+```
+
+> [!NOTE]
+> Prefer not to type the key interactively? Use the non-interactive form
+> instead: `echo "$ANTHROPIC_API_KEY" | sbx secret set -g anthropic`.
+
+Confirm the secret is now populated (the `anthropic` row should no longer be
+empty):
+
+```bash
+sbx secret ls
+```
+
+> [!IMPORTANT]
+> A sandbox only picks up secrets that exist when it is created. If you already
+> created `p1-yolo` before setting this, remove it and let the next step
+> recreate it: `sbx rm -f p1-yolo`.
+
 Run the baseline sandbox:
 
 ```bash
