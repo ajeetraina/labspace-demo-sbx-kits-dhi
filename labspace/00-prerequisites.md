@@ -163,3 +163,19 @@ cd ~/.labspace/project && ./scripts/reset-demo.sh
 ```bash
 sbx create --name prewarm claude /tmp && sbx rm -f prewarm
 ```
+
+> [!WARNING]
+> If this fails with a mount policy error such as:
+>
+> ```text
+> ERROR: create runtime: create runtime: sandboxd error: status 403:
+> mount policy denied: /private/tmp: no applicable policies for
+> op(action=fs:mount:write, resource=fs:path:/private/tmp)
+> ```
+>
+> you likely have **AI Governance** configured (for example, an
+> organization policy), and that policy does not grant the sandbox
+> permission to mount the requested path. Either adjust the governance
+> policy to allow the path, or skip this optional prewarm step. Check your
+> active policies with `sbx policy ls` and review your governance
+> configuration with your administrator.
