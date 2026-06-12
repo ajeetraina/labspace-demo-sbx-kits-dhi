@@ -180,6 +180,7 @@ sbx create --name prewarm claude /tmp && sbx rm -f prewarm
 > active policies with `sbx policy ls` and review your governance
 > configuration with your administrator.
 
+
 ## If sandboxes can't reach Docker Hub (AI Governance)
 
 This lab needs the sandbox to pull base images and tools from Docker Hub,
@@ -258,3 +259,4 @@ sbx rm -f p1-yolo      # recreate so it starts under the updated policy
 > account that is **not** subject to AI Governance (a personal account, or an
 > org without sandbox policies). The built-in local defaults already permit
 > Docker Hub, npm, and GitHub, so the lab runs without extra rules.
+
